@@ -419,6 +419,74 @@ ol.entries > li::marker { font-variant-numeric: tabular-nums; color: var(--muted
   .dated > li { grid-template-columns: 1fr; gap: 0; }
 }
 
+/* Teaching page: a table of year, session and teaching.
+   Computers and tablets: a table with year, session and teaching, in the spirit of LaTeX's
+   booktabs: strong rules at the top, under the headings and at the bottom, thin rules
+   between rows and columns, a slightly darker rule between years; "PMRF TA" and
+   "Institute TA" in bold, and a thin line between positions held in the same session.
+   Phones: the same content as a list (year, then session, then entries). */
+table.teaching {
+  width: 100%;
+  max-width: var(--measure);
+  border-collapse: collapse;
+  margin: 0 0 1.5rem;
+  border-top: 1.5px solid var(--text);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+table.teaching th, table.teaching td {
+  text-align: left;
+  vertical-align: top;
+  font-weight: 400;
+  padding: .65rem .9rem .7rem;
+}
+table.teaching thead th {
+  padding-top: .5rem;
+  padding-bottom: .45rem;
+  border-bottom: 1px solid var(--text);
+  font-variant-caps: all-small-caps;
+  letter-spacing: .05em;
+}
+table.teaching .year, table.teaching thead th:first-child { padding-left: .15rem; }
+table.teaching thead th + th, table.teaching .session, table.teaching tbody td {
+  border-left: 1px solid var(--rule);           /* the lines between the columns */
+}
+table.teaching .year { width: 1%; white-space: nowrap; }
+table.teaching .session { width: 1%; white-space: nowrap; }
+table.teaching tbody tr + tr > * { border-top: 1px solid var(--rule); }
+table.teaching tbody + tbody { border-top: 1px solid #bfbab0; }   /* between years */
+/* Several positions in one session: one under the other, divided by a thin line. */
+table.teaching ul.ta { margin: 0; padding: 0; list-style: none; }
+table.teaching ul.ta > li + li {
+  margin-top: .65rem;
+  padding-top: .65rem;
+  border-top: 1px solid var(--rule);
+}
+/* "PMRF TA" and "Institute TA" in bold, so that they can be seen at a glance. */
+table.teaching .role { font-weight: 700; }
+table.teaching tfoot td {
+  border-top: 1.5px solid var(--text);
+  padding: .6rem .15rem 0;
+  color: var(--muted);
+  font-size: .92em;
+}
+@media (max-width: 39.99em) {
+  table.teaching, table.teaching thead, table.teaching tbody, table.teaching tfoot,
+  table.teaching tr, table.teaching th, table.teaching td { display: block; width: auto; }
+  table.teaching thead {                          /* hidden, but read by screen readers */
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+  }
+  table.teaching th, table.teaching td { padding: 0; border: 0 !important; white-space: normal; }
+  table.teaching tbody { padding: .9rem 0 .4rem; }
+  table.teaching tbody + tbody {                   /* between years: darker than the lines */
+    border-top: 1px solid #bfbab0 !important;      /* between positions */
+    padding-top: 1.1rem;
+  }
+  table.teaching .year { font-size: 1.15em; margin-bottom: .2rem; }
+  table.teaching .session { font-style: italic; color: var(--muted); margin: .45rem 0 .3rem; }
+  table.teaching td { margin-bottom: .5rem; }
+  table.teaching tfoot td { border-top: 1.5px solid var(--text) !important; padding-top: .6rem; }
+}
+
 /* Formulas: long displayed formulas scroll instead of overflowing on phones. */
 mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 

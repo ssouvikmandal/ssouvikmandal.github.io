@@ -49,6 +49,7 @@ sitemap.xml, robots.txt   ← for search engines (generated)
 source/last-updated.json  ← the "last updated" date of each page (kept by build.py)
 source/motifs/            ← the three motif drawings (torus, Hopf fibration, trefoil knot)
 source/placeholders/      ← the LaTeX source of the CV placeholder
+source/archive/           ← earlier versions of pages, not published (see its README.md)
 tools/                    ← optional helpers; they need extra Python packages, build.py does not
 ```
 
@@ -114,16 +115,40 @@ different proportions is still shown undistorted.
 
 ### A teaching entry
 
-In `source/pages/teaching.html`, copy one `<li>…</li>` line, put it at the top of the list
-(newest first) and change the text. Example:
+The Teaching page (`source/pages/teaching.html`) is a table with three columns, Year,
+Session and Teaching, newest year first. Each year is one `<tbody>` block with up to two
+sessions, July–November and January–April:
 
 ```html
-  <li><span class="lead">Institute TA (Jan-April 2027)</span> for MA1234 (Course Name) under Dr. Name, Department of Mathematics, IIT Madras.</li>
+  <tbody>
+    <tr>
+      <th scope="rowgroup" class="year" rowspan="2">2026</th>
+      <th scope="row" class="session">July–November</th>
+      <td><ul class="ta">
+        <li><strong class="role">PMRF TA</strong> for Course Name course at NPTEL. Course Instructor: Prof. Name, Department of Mathematics, Institute.</li>
+        <li><strong class="role">Institute TA</strong> for MA1234 (Course Name) under Dr. Name, Department of Mathematics, IIT Madras.</li>
+      </ul></td>
+    </tr>
+    <tr>
+      <th scope="row" class="session">January–April</th>
+      <td><strong class="role">Institute TA</strong> for MA5678 (Course Name) under Dr. Name, Department of Mathematics, IIT Madras.</td>
+    </tr>
+  </tbody>
 ```
 
-The part in `<span class="lead">` is set in small capitals. For a course you teach
-yourself you might later start a second list under a heading, e.g.
-`<h2>Courses taught</h2>`, followed by `<ul class="entries"> … </ul>`.
+- A new year: copy a whole `<tbody> … </tbody>` block and put it first, right after
+  `</thead>`. `rowspan="2"` on the year is the number of sessions in that year; with only
+  one session, leave out `rowspan="2"` and the second `<tr>`.
+- One position in a session: write it straight into the `<td>`. Several positions: put
+  each in an `<li>` of a `<ul class="ta">`, as above; the page divides them by a thin line.
+- `<strong class="role">` sets "PMRF TA" or "Institute TA" in bold. When a position's
+  months differ from its session, add them after the role, e.g.
+  `<strong class="role">PMRF TA</strong> (June–October) for …`.
+- The sentence common to all PMRF TA positions is in the last row of the table
+  (`<tfoot>`); change it there.
+
+On phones the same table is shown as a list (year, session, positions). The earlier list
+version of this page is kept in `source/archive/` (see its README).
 
 ### A paper
 
