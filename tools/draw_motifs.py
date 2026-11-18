@@ -14,9 +14,8 @@ For each variant the script writes, into source/motifs/:
   <name>.svg          header version (thin lines)
   <name>-icon.svg     favicon version (fewer, thicker lines, readable at 16-32 px)
 
-tools/make_icons.py installs a motif's icon as the browser-tab and phone icons (since
-18 November 2026 the torus) and, when asked, a motif in the link-preview picture (the Hopf
-fibration).
+tools/make_preview.py draws a motif into the link-preview picture (the Hopf fibration). The
+browser-tab and phone icons (a shaded torus) are made by tools/draw_favicon.py.
 
 It also draws the very faint background drawings shown in the page margins on computer
 screens (assets/site.css sets their position and faintness):

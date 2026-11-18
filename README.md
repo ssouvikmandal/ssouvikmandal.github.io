@@ -36,8 +36,9 @@ images/photo.jpg          ← your photo
 images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
 images/orcid-id.svg, images/scholar.svg, images/email.svg ← the ORCID, Google Scholar and
                           email icons at the top of every page
-images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
-images/og-image.png       ← the browser icons (a torus) and the link preview (Hopf fibration)
+favicon.ico, images/favicon-192.png, images/apple-touch-icon.png
+                          ← the browser and phone icons (a shaded teal torus)
+images/og-image.png       ← the link-preview picture (Hopf fibration)
 images/LICENSES.txt       ← where the ORCID, Google Scholar and email icons and the logo come from
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
@@ -352,29 +353,31 @@ Google's blue; the email icon is the Feather Icons "mail" icon (MIT licence) on 
 in the accent colour. Leaving `orcid` or `google_scholar` empty in `site.toml` removes that
 icon. See `images/LICENSES.txt`.
 
-The browser-tab icon (and the icon on phone home screens) is a **torus**, the outline of a
-tilted torus with its hole. In browsers that use the SVG icon (Chrome, Firefox, Edge) its
-lines turn light when the browser is in dark mode; `favicon.ico`, for the others (Safari),
-shows it on a small light tile so that it can be seen on dark tab bars as well.
+The browser-tab icon (and the icon on phone home screens) is a **torus**, smoothly shaded
+in a soft teal: `favicon.ico` (16, 32 and 48 pixels), `images/favicon-192.png` and
+`images/apple-touch-icon.png`. It is computed by `tools/draw_favicon.py` from the torus's
+equation (each pixel follows a ray to the surface and is lit from the upper left), with
+numpy and Pillow; the 512-pixel original is `source/motifs/torus-shaded.png`. The teal is a
+mid tone, so the icon shows on light and dark tab bars alike. To change its colour, edit
+`DARK` and `LIGHT` at the top of `tools/draw_favicon.py` and run
+
+```bash
+~/venvs/math/bin/python tools/draw_favicon.py
+```
 
 The link-preview picture shows the **Hopf fibration**: seven of its fibres (circles in
 $S^3$, stereographically projected to $\mathbb{R}^3$), linked with each other, as an
-over/under diagram. A third motif, a **trefoil knot**, is ready in `source/motifs/`. All of
-them are computed by `tools/draw_motifs.py` (Python with numpy); no image was copied from
-anywhere.
-
-To change the icons or the preview picture, run (with Playwright installed)
+over/under diagram. Two more motifs, a **torus** in outline and a **trefoil knot**, are
+ready in `source/motifs/`. All of them are computed by `tools/draw_motifs.py` (Python with
+numpy); no image was copied from anywhere. To draw the preview picture with another motif,
+run (with Playwright installed)
 
 ```bash
-~/venvs/web/bin/python tools/make_icons.py torus                  # icons only
-~/venvs/web/bin/python tools/make_icons.py torus --preview hopf   # icons and preview picture
+~/venvs/web/bin/python tools/make_preview.py hopf      # or torus, or knot
 ```
 
-Without Playwright, copy `source/motifs/NAME-icon.svg` to `images/favicon.svg`; the PNG
-icons then keep the old motif.
-
-Browsers keep tab icons for a long time. After changing them, raise the number in `?v=2`
-on the three icon lines in `source/template.html` (to `?v=3`, and so on) and rebuild, so
+Browsers keep tab icons for a long time. After changing them, raise the number in `?v=3`
+on the three icon lines in `source/template.html` (to `?v=4`, and so on) and rebuild, so
 that browsers fetch the new icons.
 
 On computer screens (at least 60em, about 960 pixels, wide) the empty parts of the page carry
@@ -401,7 +404,8 @@ fontTools):
 | Tool | Does | Needs |
 |---|---|---|
 | `tools/draw_motifs.py` | draws the motif variants into `source/motifs/` and the margin drawings into `images/bg-*.svg` | numpy |
-| `tools/make_icons.py NAME [--preview NAME]` | installs a motif as the browser and phone icons (and with `--preview` in the link preview) | Playwright |
+| `tools/draw_favicon.py` | draws the shaded torus and writes the browser and phone icons | numpy, Pillow |
+| `tools/make_preview.py NAME` | draws the link-preview picture with a motif | Playwright |
 | `tools/make_fonts.py` | makes `assets/fonts/*.woff2` from TeX Live's New Computer Modern | fontTools, brotli, TeX Live |
 | `tools/screenshots.py DIR [--url URL]` | opens every page (of this folder, or of the published site with `--url`) at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
 

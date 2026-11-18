@@ -423,7 +423,7 @@ def check(cfg, files, external):
                 problems.append(f"{file}: link to {link}, but {path} does not exist")
             elif parts.fragment and path in pages and parts.fragment not in pages[path].ids:
                 problems.append(f"{file}: link to {link}, but {path} has no id {parts.fragment!r}")
-    for f in ("favicon.ico", "images/favicon.svg", "assets/email.js", OG_IMAGE, PHOTO):
+    for f in ("favicon.ico", "images/favicon-192.png", "images/apple-touch-icon.png", "assets/email.js", OG_IMAGE, PHOTO):
         if not (ROOT / f).exists():
             problems.append(f"missing file: {f}")
     if external:
