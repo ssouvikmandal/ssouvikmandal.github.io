@@ -13,6 +13,7 @@ description, followed by the page text in HTML. The text may contain these place
 which are filled in from site.toml:
 
     {{name}} {{position}} {{department}} {{institution}} {{email}}
+    {{institution_logo}}  the logo given by `institution_logo` (header of every page)
     {{email_link}}     the email address as a mailto: link
     {{address}}        the postal address, one line per entry of `address`
     {{photo}}          the photo images/photo.jpg, with its size and alt text
@@ -139,6 +140,16 @@ def placeholders(cfg):
     values["address"] = ('<address class="postal">\n'
                          + "<br>\n".join(esc(line) for line in p["address"])
                          + "\n</address>")
+    logo = p.get("institution_logo", "")
+    if logo:
+        if not (ROOT / logo).exists():
+            fail(f"site.toml: institution_logo {logo} does not exist")
+        lw, lh = image_size(ROOT / logo)
+        # Decorative: the institution's name is written right next to it.
+        values["institution_logo"] = (f'<img class="inst-logo" src="{esc(logo)}" width="{lw}" '
+                                      f'height="{lh}" alt="">')
+    else:
+        values["institution_logo"] = ""
     w, h = image_size(ROOT / PHOTO)
     values["photo"] = (f'<img class="photo" src="{PHOTO}" width="{w}" height="{h}" '
                        f'alt="Photo of {esc(p["name"])}">')

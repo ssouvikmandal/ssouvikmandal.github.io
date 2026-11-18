@@ -14,8 +14,19 @@ For each variant the script writes, into source/motifs/:
   <name>.svg          header version (thin lines)
   <name>-icon.svg     favicon version (fewer, thicker lines, readable at 16-32 px)
 
-The chosen motif is copied to images/motif.svg and images/favicon.svg by build.py
-(see `motif` in site.toml). Needs numpy, which plain Python does not have
+The chosen motif is installed as images/motif.svg and images/favicon.svg by
+tools/make_icons.py.
+
+It also draws the very faint background drawings shown in the page margins on computer
+screens (assets/site.css sets their position and faintness):
+
+  images/bg-torus.svg   a large torus with more meridians and parallels (left margin and
+                        behind the menu)
+  images/bg-knot.svg    a cinquefoil, the (2, 5) torus knot (lower left margin)
+  images/bg-hopf.svg    Hopf fibres over two circles of latitude, on two nested tori
+                        (right margin)
+
+Needs numpy, which plain Python does not have
 (on the author's server: ~/venvs/math/bin/python tools/draw_motifs.py).
 """
 import math
@@ -285,6 +296,76 @@ def knot(icon=False):
     return svg([(pieces, 1.9, 1)], 120, "Trefoil knot")
 
 
+# --- background drawings ----------------------------------------------------------------
+
+def svg_fit(groups, width, title, pad=4):
+    """Like svg(), but the drawing area has the drawing's own proportions: `width` units
+    wide (1 unit = 1 CSS pixel at the intended size). The drawing is decorative, so it
+    carries no title for screen readers; `title` is only a comment."""
+    allpts = np.vstack([p for g in groups for p in g[0]])
+    lo, hi = allpts.min(axis=0), allpts.max(axis=0)
+    scale = (width - 2 * pad) / (hi - lo)[0]
+    height = int(np.ceil((hi - lo)[1] * scale + 2 * pad))
+    body = []
+    for pieces, stroke, opacity in groups:
+        scaled = [(p - lo) * scale + pad for p in pieces]
+        op = "" if opacity == 1 else f' stroke-opacity="{opacity}"'
+        body.append(f'<path d="{path_data(scaled, tol=0.06)}" stroke-width="{stroke}"{op}/>')
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+            f'width="{width}" height="{height}" aria-hidden="true">'
+            f'<!-- {title}, drawn by tools/draw_motifs.py -->'
+            f'<g fill="none" stroke="{ACCENT}" stroke-linecap="round" stroke-linejoin="round">'
+            + "".join(body) + "</g></svg>\n")
+
+
+def bg_torus():
+    R, r = 1.0, 0.45
+    f, point, normal = torus_surface(R, r)
+    rot = rotation(-1.2, 0.0, -0.42)
+    view = rot.T @ np.array([0, 0, 1.0])
+    t = np.linspace(0, 2 * np.pi, 720)
+    lines = [(np.full_like(t, 2 * np.pi * k / 36), t) for k in range(36)]
+    lines += [(t, np.full_like(t, 2 * np.pi * k / 12 + np.pi / 12)) for k in range(12)]
+    wire = []
+    for u, v in lines:
+        P, N = point(u, v), normal(u, v)
+        xy, _ = project(P, rot)
+        wire += visible_pieces(xy, visible_on_torus(P, N, f, view))
+    u = np.linspace(0, 2 * np.pi, 2000)
+    a, b, c = view
+    v0 = np.arctan2(-(a * np.cos(u) + b * np.sin(u)), c)
+    outline = []
+    for v in (v0, v0 + np.pi):
+        P, N = point(u, v), normal(u, v)
+        xy, _ = project(P, rot)
+        outline += visible_pieces(xy, visible_on_torus(P, N, f, view))
+    return svg_fit([(wire, 0.8, 0.6), (outline, 1.3, 1)], 480, "Torus")
+
+
+def bg_knot():
+    """Cinquefoil, the (2, 5) torus knot: ((3 + cos 5t) cos 2t, (3 + cos 5t) sin 2t, sin 5t)."""
+    t = np.linspace(0, 2 * np.pi, 1500, endpoint=False)
+    curve = np.stack([(3 + np.cos(5 * t)) * np.cos(2 * t), (3 + np.cos(5 * t)) * np.sin(2 * t),
+                      np.sin(5 * t)], axis=-1)
+    xy, dep = project(curve, rotation(0.0, 0.0, np.pi / 2))
+    under = crossings([xy], [dep], [True], min_sep=20)
+    span = np.ptp(xy, axis=0).max()
+    return svg_fit([(cut(xy, True, under[0], span * 0.028), 1.3, 1)], 260, "Cinquefoil knot")
+
+
+def bg_hopf():
+    rot = rotation(-0.8, 0.0, 0.55)
+    fibres = [hopf_fibre(np.pi / 2.4, 2 * np.pi * k / 10, 600) for k in range(10)]
+    fibres += [hopf_fibre(np.pi / 6, 2 * np.pi * (k + 0.5) / 5, 600) for k in range(5)]
+    xy, dep = zip(*(project(c, rot) for c in fibres))
+    under = crossings(xy, dep, [True] * len(fibres))
+    span = np.ptp(np.vstack(xy), axis=0).max()
+    pieces = []
+    for c, g in zip(xy, under):
+        pieces += cut(c, True, g, span * 0.008)
+    return svg_fit([(pieces, 0.9, 1)], 420, "Hopf fibration")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in [("torus", torus), ("hopf", hopf), ("knot", knot)]:
@@ -292,6 +373,10 @@ def main():
             path = OUT / f"{name}{'-icon' if icon else ''}.svg"
             path.write_text(fn(icon))
             print(f"{path.relative_to(HERE)}: {path.stat().st_size // 1024 + 1} KB")
+    for name, fn in [("bg-torus", bg_torus), ("bg-knot", bg_knot), ("bg-hopf", bg_hopf)]:
+        path = HERE / "images" / f"{name}.svg"
+        path.write_text(fn())
+        print(f"{path.relative_to(HERE)}: {path.stat().st_size // 1024 + 1} KB")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 # Website of Souvik Mandal
 
 Source and published files of <https://ssouvikmandal.github.io>, moved from the Google Site
-<https://sites.google.com/view/souvik-mandal> on 18 November 2026.
+<https://sites.google.com/view/souvik-mandal> on 18 November 2026. The text of the pages is
+the Google Site's text, with a few typing errors corrected; the Publications page was added
+from arXiv.
 
 The published site is plain HTML and CSS with relative links. Fonts and MathJax are stored
 here, and the site uses no outside services, trackers or cookies. A page is only regenerated
@@ -15,7 +17,7 @@ when you run `python3 build.py`, which needs Python 3.11 or later and nothing el
 - [Publishing](#publishing)
 - [Placeholders](#placeholders)
 - [Moving the site](#moving-the-site): your own domain · a university server
-- [The motif](#the-motif)
+- [The motif and the drawings in the margins](#the-motif-and-the-drawings-in-the-margins)
 - [Tools and licences](#tools-and-licences)
 
 ## The files
@@ -26,10 +28,12 @@ source/pages/*.html       ← the text of each page (edit these)
 source/template.html      ← the frame around every page: head, header, menu, footer
 build.py                  ← turns the two above into the published pages
 index.html, cv.html, …    ← the published pages (generated: do not edit by hand)
-cv.pdf                    ← your CV
+cv.pdf                    ← your CV (at present a placeholder, see "Placeholders")
 images/photo.jpg          ← your photo
+images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
 images/motif.svg, images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
 images/og-image.png       ← the motif in the header, the browser icons, the link preview
+images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
 assets/fonts/             ← the text font (New Computer Modern), see its README.txt
 assets/mathjax/, assets/mathjax-config.js   ← MathJax for formulas, see README-SITE.txt
@@ -37,12 +41,13 @@ sitemap.xml, robots.txt   ← for search engines (generated)
 404.html                  ← the "page not found" page (generated)
 source/last-updated.json  ← the "last updated" date of each page (kept by build.py)
 source/motifs/            ← the three motif drawings (torus, Hopf fibration, trefoil knot)
+source/placeholders/      ← the LaTeX source of the CV placeholder
 tools/                    ← optional helpers; they need extra Python packages, build.py does not
 ```
 
 Page addresses never change: `index.html`, `cv.html`, `research.html`,
-`achievements.html`, `teaching.html`, `conferences.html` and `contact.html`, and the CV is
-always `cv.pdf`. When you update a file, keep its name, so that old links keep working.
+`publications.html`, `achievements.html`, `teaching.html`, `conferences.html` and
+`contact.html`, and the CV is always `cv.pdf`. When you update a file, keep its name, so that old links keep working.
 
 ## Everyday changes
 
@@ -63,6 +68,7 @@ Everything that changes with a job is in `site.toml`, under `[person]`:
 position = "Postdoctoral Fellow"
 department = "Department of Mathematics"
 institution = "Example University"
+institution_logo = "images/logo-example-university.png"   # or "" for no logo
 email = "new.address@example.edu"
 address = [
   "Souvik Mandal",
@@ -74,13 +80,18 @@ address = [
 
 `position`, `department` and `institution` appear under your name on every page, in the
 page descriptions for search engines and in the structured data (schema.org) on the home
-page. `email` and `address` appear on the Contact page. Then rebuild. The introduction on
+page. `institution_logo` is the small logo shown beside that line: put the new logo (a
+square PNG, about 128 × 128 pixels) in `images/` and give its name here, or write `""` to
+show none. Keep the old logo file only if some page still uses it. `email` and `address` appear on the Contact page. Then rebuild. The introduction on
 the home page is ordinary text: edit it in `source/pages/index.html`.
 
 ### The CV
 
 Replace `cv.pdf` with the new file (same name) and run `python3 build.py`. Every link to the
-CV points to `cv.pdf`, so nothing else changes.
+CV points to `cv.pdf`, so nothing else changes. (At present `cv.pdf` is a placeholder; see
+[Placeholders](#placeholders).) Everything committed here stays public in the repository's
+history, even after it is replaced, so check a CV for private details (date of birth, phone
+number, home address) before committing it.
 
 ### The photo
 
@@ -103,28 +114,27 @@ yourself you might later start a second list under a heading, e.g.
 
 ### A paper
 
-There is no Publications page yet. To start one, create
-`source/pages/publications.html`:
+Papers are listed in `source/pages/publications.html`, newest first. For a new preprint,
+copy the first `<li>…</li>` block, put the copy at the top of the list, and fill it in
+exactly as arXiv shows the paper:
 
 ```html
-<!--
-title: Publications
-description: Publications and preprints of {{name}}, {{department}}, {{institution}}.
--->
-<h1>Publications</h1>
-
-<h2>Preprints</h2>
-<ol class="entries" reversed>
   <li>
-    <span class="title">Title of the paper</span>, with A. Coauthor.
-    <span class="meta">Preprint, 2027.</span>
-    <span class="links"><a href="https://arxiv.org/abs/2701.01234">arXiv</a></span>
+    <span class="authors">Souvik Mandal, A. Coauthor</span>.
+    <span class="title">Title of the paper</span>.
+    <span class="nowrap"><a href="https://arxiv.org/abs/2701.01234">arXiv:2701.01234</a> <span class="meta">[math.AT]</span></span>
   </li>
-</ol>
+```
 
+`reversed` on the list makes the numbers count down, so the oldest paper stays number 1.
+When a paper is published, start a second list above the preprints and move its entry
+there, adding the journal and the DOI:
+
+```html
 <h2>Published papers</h2>
 <ol class="entries" reversed>
   <li>
+    <span class="authors">Souvik Mandal, A. Coauthor</span>.
     <span class="title">Title of the paper</span>.
     <span class="meta">Journal Name <b>12</b> (2027), no. 3, 1–20.</span>
     <span class="links"><a href="https://doi.org/10.xxxx/xxxxx">DOI</a> <a href="https://arxiv.org/abs/2601.01234">arXiv</a> <a href="papers/short-name.pdf">PDF</a></span>
@@ -132,20 +142,9 @@ description: Publications and preprints of {{name}}, {{department}}, {{instituti
 </ol>
 ```
 
-and add it to the menu in `site.toml`, at the place where it should appear:
-
-```toml
-[[nav]]
-label = "Publications"
-file = "publications.html"
-```
-
-New papers go at the top of their list; `reversed` makes the numbers count down, so the
-oldest paper stays number 1. When a preprint is published, move its `<li>` to the second
-list and add the journal and DOI. Keep the format of every entry the same:
-title in `<span class="title">`, coauthors after "with", journal data in
-`<span class="meta">`, links in `<span class="links">`. Put PDFs of your own papers in a
-folder `papers/` with short, permanent names (e.g. `papers/surgery-cayley.pdf`).
+Keep every entry in the same order: authors, title (`<span class="title">`, set in italics),
+journal data (`<span class="meta">`), links. Put PDFs of your own papers in a folder
+`papers/` with short, permanent names (e.g. `papers/surgery-cayley.pdf`).
 
 ### A talk
 
@@ -172,7 +171,7 @@ folder `slides/`.
 
 ### A new section (News, Students, …)
 
-Any new page works like Publications and Talks: create `source/pages/NAME.html` beginning
+Any new page works like the Talks page: create `source/pages/NAME.html` beginning
 with the comment that holds `title:` and `description:` (both should contain `{{name}}`,
 so that search engines see your name), write the text in HTML, add the page to `[[nav]]`
 in `site.toml`, and rebuild. The menu has room for more entries: on a computer it is a
@@ -214,7 +213,9 @@ GitHub to publish the files exactly as they are, without processing them.
 On the server, the remote is `git@github-website:ssouvikmandal/ssouvikmandal.github.io.git`,
 where `github-website` is an SSH alias (in `~/.ssh/config`) that uses the deploy key
 `~/.ssh/id_ed25519_github_website`, which can write to this one repository only.
-`.git/hooks/pre-commit` runs `~/.local/bin/work-backup pre-commit`, the same check as in
+Commits are made as "Souvik Mandal" with the GitHub no-reply address
+`325233884+ssouvikxyz@users.noreply.github.com` (set in this repository's `.git/config`), so
+no real email address appears in the public history. `.git/hooks/pre-commit` runs `~/.local/bin/work-backup pre-commit`, the same check as in
 `~/work`: it leaves files larger than 70 MB out of a commit (listing them at the end of
 `.gitignore`) and refuses to commit text files that contain a private key or an access
 token. Git hooks are not copied by `git clone`; `~/work/server-config/README.md` says how to
@@ -222,10 +223,14 @@ set them up again.
 
 ## Placeholders
 
-None at present: the photo (`images/photo.jpg`) and the CV (`cv.pdf`, the file
-"CV(UPDATED_OCT2024).pdf" linked from the Google Site) were both downloaded from the Google
-Site. If a file ever has to be replaced by a placeholder, give the placeholder the final
-name, list it here, and later just overwrite it with the real file (same name) and rebuild.
+| File | Placeholder for | Replace it by |
+|---|---|---|
+| `cv.pdf` | the CV (the October 2024 CV from the Google Site is deliberately not published) | overwriting `cv.pdf` with the new CV, then `python3 build.py`, commit, push |
+
+The placeholder is one page saying that the CV will be added soon; its source is
+`source/placeholders/cv-placeholder.tex` (`lualatex cv-placeholder.tex`). Every link already
+points to `cv.pdf`, so replacing the file is enough. When the real CV is in place, delete
+this row.
 
 ## Moving the site
 
@@ -261,7 +266,7 @@ The old address `ssouvikmandal.github.io` then redirects to the new domain autom
 
 Keep this repository as the master copy, so that you can later move again.
 
-## The motif
+## The motif and the drawings in the margins
 
 The line drawing in the header and the browser icon show the **Hopf fibration**: seven of
 its fibres (circles in $S^3$, stereographically projected to $\mathbb{R}^3$), linked
@@ -281,9 +286,19 @@ Playwright, copy `source/motifs/torus.svg` to `images/motif.svg` and
 `source/motifs/torus-icon.svg` to `images/favicon.svg`; the PNG icons and the preview
 picture then keep the old motif.
 
+On computer screens (at least 60em, about 960 pixels, wide) the empty parts of the page carry
+very faint drawings, also computed by `tools/draw_motifs.py`: a torus behind the menu and in
+the left margin (`images/bg-torus.svg`), a cinquefoil knot lower in the left margin
+(`images/bg-knot.svg`) and Hopf fibres on two nested tori in the right margin
+(`images/bg-hopf.svg`, only on screens at least 80em, about 1280 pixels, wide). Their areas
+end 1rem before the text column and start 1rem after it, so they never lie behind the text;
+phones and tablets do not show them. Their faintness is `--drawing-opacity: .16` at the top
+of `assets/site.css`. At that value even the darkest point of a line leaves a contrast of
+12.7:1 for the menu text (at least 4.5:1 is required); keep it at .25 or below.
+
 The accent colour (links, menu, motif) is `--accent: #2e4a68` at the top of
 `assets/site.css`; if you change it, change `ACCENT` in `tools/draw_motifs.py` too and
-redraw the motif.
+redraw the motif and the drawings.
 
 ## Tools and licences
 
@@ -294,7 +309,7 @@ fontTools):
 
 | Tool | Does | Needs |
 |---|---|---|
-| `tools/draw_motifs.py` | draws the motif variants into `source/motifs/` | numpy |
+| `tools/draw_motifs.py` | draws the motif variants into `source/motifs/` and the margin drawings into `images/bg-*.svg` | numpy |
 | `tools/make_icons.py NAME` | installs a motif: header image, icons, link preview | Playwright |
 | `tools/make_fonts.py` | makes `assets/fonts/*.woff2` from TeX Live's New Computer Modern | fontTools, brotli, TeX Live |
 | `tools/screenshots.py DIR` | opens every page at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
@@ -304,4 +319,6 @@ fontTools):
 Licences of what is included: the fonts are New Computer Modern by Antonis Tsolomitis
 (GUST Font License, see `assets/fonts/`); MathJax 4.1.3 and its New Computer Modern math
 font are under the Apache License 2.0 (see `assets/mathjax/`). The texts, the photo and
-the CV are © Souvik Mandal.
+the CV are © Souvik Mandal. The IIT Madras logo belongs to IIT Madras; it is the logo
+file used on the old Google Site, reduced from 1200 to 128 pixels (shape and colours
+unchanged).

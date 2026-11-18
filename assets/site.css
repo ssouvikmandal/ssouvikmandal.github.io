@@ -37,6 +37,7 @@
   --accent: #2e4a68;      /* the one accent colour: links, menu, motif (muted slate blue) */
   --accent-dark: #1d3149; /* links on hover */
   --rule: #dedad1;        /* thin lines */
+  --drawing-opacity: .16; /* faintness of the drawings in the margins (computers only) */
   --serif: "NewCM Web", "NewCM Web Math", "Latin Modern Roman", "CMU Serif",
            "Computer Modern Serif", Georgia, "Times New Roman", serif;
   --measure: 40rem;       /* width of the text column */
@@ -96,6 +97,40 @@ body {
   .site-nav { grid-area: nav; }
   main { grid-area: main; }
   .site-footer > p { padding-left: calc(2rem + var(--side) + var(--gap)); }
+}
+
+/* Faint drawings from topology in the empty parts of the page (computers only): a torus
+   and a cinquefoil knot in the left margin and behind the menu, Hopf fibres in the right
+   margin. Their areas end 1rem before the text column starts and 1rem after it ends, so
+   they never lie behind the text. They are drawn by tools/draw_motifs.py. */
+@media (min-width: 60em) {
+  body { position: relative; }
+  body::before, body::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    opacity: var(--drawing-opacity);
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  body::before {                       /* left margin and menu column */
+    left: 0;
+    width: calc(50% - 12rem);          /* the text column starts at 50% - 11rem */
+    background-image: url("../images/bg-torus.svg"), url("../images/bg-knot.svg");
+    background-size: 30rem auto, 15rem auto;
+    background-position: right 0 top 10rem, left 2rem top 38rem;
+  }
+}
+@media (min-width: 80em) {
+  body::after {                        /* right margin */
+    left: calc(50% + 30rem);           /* the text column ends at 50% + 29rem */
+    right: 0;
+    background-image: url("../images/bg-hopf.svg");
+    background-size: 26rem auto;
+    background-position: left 0 top 2.5rem;
+  }
 }
 
 /* Skip link: hidden until it receives keyboard focus. */
@@ -172,12 +207,31 @@ a[href$=".pdf"]::after {
   .name { font-size: 2.25rem; }
 }
 .affiliation {
-  margin: .35rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin: .45rem 0 0;
   color: var(--muted);
   font-size: .95rem;
   line-height: 1.4;
 }
-.affiliation span { display: inline-block; }
+.aff-text span { display: inline-block; }
+.inst-logo {               /* logo of the institution, from site.toml */
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+@media (max-width: 39.99em) {
+  /* Phones: motif and name side by side, the logo and affiliation in a row below. */
+  .site-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 1rem;
+  }
+  .brand-text { display: contents; }
+  .affiliation { grid-column: 1 / -1; margin-top: 1rem; }
+}
 
 /* Menu */
 .site-nav ul {
@@ -357,6 +411,7 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width:
 @media print {
   :root { --bg: #fff; --text: #000; --muted: #333; --accent: #000; }
   .site-nav, .skip, .motif { display: none; }
+  body::before, body::after { display: none; }
   .page { display: block; }
   .site-header { padding: 0 0 1rem; display: block; }
   main { padding-top: 1rem; }

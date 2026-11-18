@@ -15,6 +15,9 @@ name = "Souvik Mandal"
 position = "Research Scholar"
 department = "Department of Mathematics"
 institution = "IIT Madras"
+# Logo shown beside the affiliation line on every page; change it with the institution,
+# or set it to "" for no logo.
+institution_logo = "images/logo-iit-madras.png"
 email = "ma22d014@smail.iitm.ac.in"
 orcid = "https://orcid.org/0009-0004-0429-3063"
 google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
@@ -23,7 +26,7 @@ research_areas = ["Topology", "Geometry"]
 # Postal address, one line per entry, as shown on the Contact page.
 address = [
   "Souvik Mandal",
-  "Research Scholar, Deparment of Mathematics, IIT Madras",
+  "Research Scholar, Department of Mathematics, IIT Madras",
   "NAC-620, IIT Madras",
   "Chennai -600036",
   "India",
@@ -44,6 +47,10 @@ file = "cv.html"
 [[nav]]
 label = "Research"
 file = "research.html"
+
+[[nav]]
+label = "Publications"
+file = "publications.html"
 
 [[nav]]
 label = "Achievements"
