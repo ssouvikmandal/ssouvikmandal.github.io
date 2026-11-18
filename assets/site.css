@@ -229,19 +229,25 @@ a[href$=".pdf"]::after {
   height: 1.75rem;
 }
 @media (max-width: 39.99em) {
-  /* Phones: the name with the two icons beside it, the logo and affiliation below. */
+  /* Phones: the name with the icons beside it (below it if there is no room), then the
+     logo and affiliation. */
   .site-header {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas: "name icons" "aff aff";
-    align-items: center;
+    flex-wrap: wrap;
     column-gap: 1rem;
+    row-gap: .75rem;
   }
   .brand-text { display: contents; }
-  .name { grid-area: name; }
-  .header-icons { grid-area: icons; flex-direction: row; gap: .9rem; }
+  .name { order: 1; }
+  .header-icons { order: 2; flex-direction: row; gap: .9rem; }
   .header-icons img { width: 1.75rem; height: 1.75rem; }
-  .affiliation { grid-area: aff; margin-top: 1rem; }
+  .affiliation { order: 3; flex-basis: 100%; margin-top: .25rem; }
+}
+@media (max-width: 22.49em) {
+  /* Small phones (under 360 pixels): a little smaller, so that all fits on one line. */
+  .name { font-size: 1.5rem; }
+  .site-header { column-gap: .8rem; }
+  .header-icons { gap: .65rem; }
+  .header-icons img { width: 1.5rem; height: 1.5rem; }
 }
 
 /* Menu */

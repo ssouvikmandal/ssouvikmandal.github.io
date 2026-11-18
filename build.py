@@ -20,7 +20,8 @@ which are filled in from site.toml:
     {{photo}}          the photo images/photo.jpg, with its size and alt text
     {{orcid_link}}     link to the ORCID profile
     {{scholar_link}}   link to the Google Scholar profile
-    {{profile_links}}  a line with links to the CV, ORCID and Google Scholar
+    {{profile_links}}  a line with the link to the CV (ORCID, Google Scholar and email are
+                       icons at the top of every page)
 
 Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
 MathJax from assets/mathjax/.
@@ -179,13 +180,17 @@ def placeholders(cfg):
         address = real_address(written)
         rows.append(f"  <dt>Email ({esc(label)}):</dt>\n  <dd>{email_link(address)}{email_text(address)}</a></dd>")
     values["email_rows"] = "\n".join(rows)
-    # The two icons at the top of every page: ORCID record and email.
+    # The icons at the top of every page: ORCID record, Google Scholar profile, email.
     icons = []
     if p.get("orcid"):
         orcid_id = p["orcid"].rstrip("/").rsplit("/", 1)[-1]
         icons.append(f'<a class="icon" href="{esc(p["orcid"])}" title="ORCID record: {esc(orcid_id)}" '
                      f'aria-label="ORCID record of {esc(p["name"])}">'
                      '<img src="images/orcid-id.svg" alt="" width="24" height="24"></a>')
+    if p.get("google_scholar"):
+        icons.append(f'<a class="icon" href="{esc(p["google_scholar"])}" title="Google Scholar profile" '
+                     f'aria-label="Google Scholar profile of {esc(p["name"])}">'
+                     '<img src="images/scholar.svg" alt="" width="24" height="24"></a>')
     icons.append(email_link(main_email, f'Email {p["name"]}').replace('class="email"', 'class="icon"')
                  + '<img src="images/email.svg" alt="" width="24" height="24"></a>')
     values["header_icons"] = '<div class="header-icons">' + "".join(icons) + "</div>"
@@ -205,21 +210,17 @@ def placeholders(cfg):
     w, h = image_size(ROOT / PHOTO)
     values["photo"] = (f'<img class="photo" src="{PHOTO}" width="{w}" height="{h}" '
                        f'alt="Photo of {esc(p["name"])}">')
-    links = []
     if p.get("orcid"):
         orcid_id = p["orcid"].rstrip("/").rsplit("/", 1)[-1]
         values["orcid_link"] = (f'<a href="{esc(p["orcid"])}" title="ORCID iD {esc(orcid_id)}">'
                                 "ORCID</a>")
-        links.append(values["orcid_link"])
     else:
         values["orcid_link"] = ""
     if p.get("google_scholar"):
         values["scholar_link"] = f'<a href="{esc(p["google_scholar"])}">Google Scholar</a>'
-        links.append(values["scholar_link"])
     else:
         values["scholar_link"] = ""
-    if (ROOT / CV).exists():
-        links.insert(0, f'<a href="{CV}">CV</a>')
+    links = [f'<a href="{CV}">CV</a>'] if (ROOT / CV).exists() else []
     values["profile_links"] = ('<p class="profile-links">'
                                + '<span class="dot" aria-hidden="true">·</span>'.join(links)
                                + "</p>")

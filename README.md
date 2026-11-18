@@ -34,10 +34,11 @@ index.html, cv.html, …    ← the published pages (generated: do not edit by h
 cv.pdf                    ← your CV (at present a placeholder, see "Placeholders")
 images/photo.jpg          ← your photo
 images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
-images/orcid-id.svg, images/email.svg ← the ORCID and email icons at the top of every page
+images/orcid-id.svg, images/scholar.svg, images/email.svg ← the ORCID, Google Scholar and
+                          email icons at the top of every page
 images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
 images/og-image.png       ← the browser icons (a Hopf link) and the link preview
-images/LICENSES.txt       ← where the ORCID icon, the email icon and the logo come from
+images/LICENSES.txt       ← where the ORCID, Google Scholar and email icons and the logo come from
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
 assets/email.js           ← turns the protected email links into mailto: links
@@ -315,12 +316,17 @@ Keep this repository as the master copy, so that you can later move again.
 
 ## The icons, the motif and the drawings in the margins
 
-At the top of every page, to the left of the name (beside it on phones), are two icons: the
-official ORCID iD icon, linking to the ORCID record (`orcid` in `site.toml`), and an email
-icon that opens a new email to the main address. Both have a tooltip and a label for screen
-readers. The ORCID icon must be used as ORCID provides it (green, unaltered); the email
-icon is the Feather Icons "mail" icon (MIT licence) on a circle in the accent colour. See
-`images/LICENSES.txt`.
+At the top of every page, to the left of the name (beside it on phones), are three icons,
+one below the other: the official ORCID iD icon, linking to the ORCID record (`orcid` in
+`site.toml`); the Google Scholar icon, linking to the Google Scholar profile
+(`google_scholar`); and an email icon that writes to the main address (see
+[Email addresses and spam](#email-addresses-and-spam)). Each has a tooltip and a label for
+screen readers, and the pages themselves carry no separate ORCID or Google Scholar text
+links. The ORCID icon must be used as ORCID provides it (green, unaltered). The Google
+Scholar icon is Google's Scholar mark (shape from Simple Icons) in white on a circle in
+Google's blue; the email icon is the Feather Icons "mail" icon (MIT licence) on a circle
+in the accent colour. Leaving `orcid` or `google_scholar` empty in `site.toml` removes that
+icon. See `images/LICENSES.txt`.
 
 The browser icon and the link-preview picture show the **Hopf fibration**: the preview
 shows seven of its fibres (circles in $S^3$, stereographically projected to
