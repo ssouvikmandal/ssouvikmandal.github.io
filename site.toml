@@ -33,8 +33,11 @@ institution_logo = "images/logo-iit-madras.png"
 email = "ssouvik.xyz [at] gmail.com"
 # Further addresses shown on the Contact page, each as ["label", "address"].
 other_emails = [["IIT Madras", "ma22d014 [at] smail.iitm.ac.in"]]
+# Profiles, linked by the icons at the top of every page in this order (then the email
+# icon), and named to search engines as yours. Write "" to leave one out.
 orcid = "https://orcid.org/0009-0004-0429-3063"
 google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
+researchgate = "https://www.researchgate.net/profile/Souvik-Mandal-10"
 # For search engines only: these go into the description of you that Google and other
 # search engines read from the home page (schema.org; see README.md, "Search engines").
 # They are not shown on the pages, so keep them in line with what the pages say.

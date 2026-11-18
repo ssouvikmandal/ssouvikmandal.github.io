@@ -35,12 +35,13 @@ index.html, cv.html, …    ← the published pages (generated: do not edit by h
 cv.pdf                    ← your CV (at present a placeholder, see "Placeholders")
 images/photo.jpg          ← your photo
 images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
-images/orcid-id.svg, images/scholar.svg, images/email.svg ← the ORCID, Google Scholar and
-                          email icons at the top of every page
+images/orcid-id.svg, images/scholar.svg, images/researchgate.svg, images/email.svg
+                          ← the ORCID, Google Scholar, ResearchGate and email icons at
+                          the top of every page
 favicon.ico, images/favicon-192.png, images/apple-touch-icon.png
                           ← the browser and phone icons (a shaded teal torus)
 images/og-image.png       ← the link-preview picture (Hopf fibration)
-images/LICENSES.txt       ← where the ORCID, Google Scholar and email icons and the logo come from
+images/LICENSES.txt       ← where the ORCID, Google Scholar, ResearchGate and email icons and the logo come from
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
 assets/email.js           ← turns the protected email links into mailto: links
@@ -286,9 +287,9 @@ headers, so nothing here needs editing by hand:
   only, not shown on the page): the site's name (`WebSite`, which Google uses as the site
   name in results) and a `ProfilePage` about you (`Person`): name, photo, position,
   institution and department with their web addresses, places studied (`studied_at`),
-  awards (`awards`), research areas (`research_areas`), ORCID iD, and the ORCID and Google
-  Scholar profiles as the same person (`sameAs`). All of it comes from `site.toml`; keep it
-  in line with the pages. The ORCID and Google Scholar icons also carry `rel="me"`. The
+  awards (`awards`), research areas (`research_areas`), ORCID iD, and the ORCID, Google
+  Scholar and ResearchGate profiles as the same person (`sameAs`). All of it comes from `site.toml`; keep it
+  in line with the pages. The ORCID, Google Scholar and ResearchGate icons also carry `rel="me"`. The
   profile also says when the site was first published (`created` in `site.toml`) and when
   the home page last changed (kept in `source/last-updated.json`), both as date, time and
   time zone, e.g. `2026-11-18T10:31:41+00:00`: Google marks plain dates there as invalid.
@@ -411,17 +412,22 @@ Keep this repository as the master copy, so that you can later move again.
 
 ## The icons, the motif and the drawings in the margins
 
-At the top of every page, to the left of the name (beside it on phones), are three icons,
+At the top of every page, to the left of the name (beside it on phones), are four icons,
 one below the other: the official ORCID iD icon, linking to the ORCID record (`orcid` in
 `site.toml`); the Google Scholar icon, linking to the Google Scholar profile
-(`google_scholar`); and an email icon that writes to the main address (see
+(`google_scholar`); the ResearchGate icon, linking to the ResearchGate profile
+(`researchgate`); and an email icon that writes to the main address (see
 [Email addresses and spam](#email-addresses-and-spam)). Each has a tooltip and a label for
 screen readers, and the pages themselves carry no separate ORCID or Google Scholar text
 links. The ORCID icon must be used as ORCID provides it (green, unaltered). The Google
 Scholar icon is Google's Scholar mark (shape from Simple Icons) in white on a circle in
-Google's blue; the email icon is the Feather Icons "mail" icon (MIT licence) on a circle
-in the accent colour. Leaving `orcid` or `google_scholar` empty in `site.toml` removes that
-icon. See `images/LICENSES.txt`.
+Google's blue; the ResearchGate icon is ResearchGate's "RG" mark (shape from
+Simple Icons) in white on a circle in a slightly deeper ResearchGate teal (`#00A396`, for
+a contrast of at least 3:1); the email icon is the Feather Icons "mail" icon (MIT licence)
+on a circle in the accent colour. Leaving `orcid`, `google_scholar` or `researchgate` empty
+in `site.toml` removes that icon. On phones the icons get smaller below 390 pixels of
+screen width, so that all four stay beside the name (`assets/site.css`, "Phones"). See
+`images/LICENSES.txt`.
 
 The browser-tab icon (and the icon on phone home screens) is a **torus**, smoothly shaded
 in a soft teal: `favicon.ico` (16, 32 and 48 pixels), `images/favicon-192.png` and
@@ -479,7 +485,9 @@ fontTools):
 | `tools/make_fonts.py` | makes `assets/fonts/*.woff2` from TeX Live's New Computer Modern | fontTools, brotli, TeX Live |
 | `tools/screenshots.py DIR [--url URL]` | opens every page (of this folder, or of the published site with `--url`) at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
 
-`python3 build.py --external` also tests the links to other websites.
+`python3 build.py --external` also tests the links to other websites. ResearchGate answers
+every program with "403 Forbidden", so its link is skipped there (listed in
+`REFUSES_LINK_CHECKS` in `build.py`); open it in a browser instead.
 
 Licences of what is included: the fonts are New Computer Modern by Antonis Tsolomitis
 (GUST Font License, see `assets/fonts/`); MathJax 4.1.3 and its New Computer Modern math

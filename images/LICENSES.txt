@@ -18,6 +18,15 @@ scholar.svg
   https://commons.wikimedia.org/wiki/File:Google_Scholar_logo.svg). It is used only to link
   to the Google Scholar profile of the site's owner.
 
+researchgate.svg
+  The ResearchGate mark, a trademark of ResearchGate GmbH, in white on a circle in a
+  slightly deeper shade of ResearchGate's teal (#00A396; Simple Icons gives #00CCBB, on
+  which white has a contrast of only 2:1). The shape is the "researchgate" icon of Simple
+  Icons 16.38.0 (https://simpleicons.org, npm package "simple-icons" 16.38.0, checked
+  against the registry's sha512 checksum; the project is released under CC0 1.0, and it
+  lists no separate licence for this icon; its source is https://www.researchgate.net). It
+  is used only to link to the ResearchGate profile of the site's owner.
+
 email.svg
   The "mail" icon of Feather Icons 4.29.2 (https://feathericons.com, npm package
   "feather-icons" 4.29.2, checked against the registry's sha512 checksum), drawn in white

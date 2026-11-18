@@ -189,7 +189,8 @@ def placeholders(cfg):
         address = real_address(written)
         rows.append(f"  <dt>Email ({esc(label)}):</dt>\n  <dd>{email_link(address)}{email_text(address)}</a></dd>")
     values["email_rows"] = "\n".join(rows)
-    # The icons at the top of every page: ORCID record, Google Scholar profile, email.
+    # The icons at the top of every page: ORCID record, Google Scholar profile,
+    # ResearchGate profile, email.
     # rel="me" says that these profiles belong to the owner of this site.
     icons = []
     if p.get("orcid"):
@@ -201,6 +202,10 @@ def placeholders(cfg):
         icons.append(f'<a class="icon" href="{esc(p["google_scholar"])}" rel="me" title="Google Scholar profile" '
                      f'aria-label="Google Scholar profile of {esc(p["name"])}">'
                      '<img src="images/scholar.svg" alt="" width="24" height="24"></a>')
+    if p.get("researchgate"):
+        icons.append(f'<a class="icon" href="{esc(p["researchgate"])}" rel="me" title="ResearchGate profile" '
+                     f'aria-label="ResearchGate profile of {esc(p["name"])}">'
+                     '<img src="images/researchgate.svg" alt="" width="24" height="24"></a>')
     icons.append(email_link(main_email, f'Email {p["name"]}').replace('class="email"', 'class="icon"')
                  + '<img src="images/email.svg" alt="" width="24" height="24"></a>')
     values["header_icons"] = '<div class="header-icons">' + "".join(icons) + "</div>"
@@ -332,7 +337,7 @@ def home_jsonld(cfg, title, description, modified):
         person["award"] = p["awards"]
     if p.get("research_areas"):
         person["knowsAbout"] = p["research_areas"]
-    same_as = [u for u in (p.get("orcid"), p.get("google_scholar")) if u]
+    same_as = [u for u in (p.get("orcid"), p.get("google_scholar"), p.get("researchgate")) if u]
     if same_as:
         person["sameAs"] = same_as
     if p.get("orcid"):
@@ -544,6 +549,10 @@ def check(cfg, files, external):
         for url in sorted(outside):
             status = fetch_status(url)
             ok = isinstance(status, int) and status < 400
+            if (not ok and status == 403
+                    and urllib.parse.urlsplit(url).hostname in REFUSES_LINK_CHECKS):
+                print(f"  skip {status}  {url}  (this site refuses programs; open it in a browser)")
+                continue
             print(f"  {'ok  ' if ok else 'FAIL'} {status}  {url}")
             if not ok:
                 problems.append(f"outside link may be broken ({status}): {url}")
@@ -552,6 +561,11 @@ def check(cfg, files, external):
     for p in problems:
         print("  - " + p)
     return not problems
+
+
+# Sites that answer every program (not a browser) with 403 "Forbidden", so that a link
+# check cannot tell whether a page exists there.
+REFUSES_LINK_CHECKS = {"www.researchgate.net"}
 
 
 def fetch_status(url):
