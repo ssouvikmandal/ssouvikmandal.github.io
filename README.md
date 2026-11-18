@@ -17,6 +17,7 @@ when you run `python3 build.py`, which needs Python 3.11 or later and nothing el
 - [Everyday changes](#everyday-changes): position, email, address · CV · photo · a
   teaching entry · a paper · a talk · a new section · formulas
 - [Publishing](#publishing)
+- [Search engines](#search-engines): what the site does · what only you can do
 - [Email addresses and spam](#email-addresses-and-spam)
 - [Placeholders](#placeholders)
 - [Moving the site](#moving-the-site): your own domain · a university server
@@ -78,6 +79,9 @@ position = "Postdoctoral Fellow"
 department = "Department of Mathematics"
 institution = "Example University"
 institution_logo = "images/logo-example-university.png"   # or "" for no logo
+institution_full_name = "Example University"               # for search engines
+institution_url = "https://www.example.edu/"
+department_url = "https://math.example.edu/"
 email = "your.name [at] example.org"                      # main address, written with [at]
 other_emails = [["Example University", "s.mandal [at] example.edu"]]
 address = [
@@ -90,7 +94,8 @@ address = [
 
 `position`, `department` and `institution` appear under your name on every page, in the
 page descriptions for search engines and in the structured data (schema.org) on the home
-page. `institution_logo` is the small logo shown beside that line: put the new logo (a
+page; `institution_full_name`, `institution_url` and `department_url` appear only in that
+structured data (see [Search engines](#search-engines)). `institution_logo` is the small logo shown beside that line: put the new logo (a
 square PNG, about 128 × 128 pixels) in `images/` and give its name here, or write `""` to
 show none. Keep the old logo file only if some page still uses it. `email` is the main
 address: the email icon at the top of every page opens it, and it comes first on the
@@ -261,6 +266,63 @@ no real email address appears in the public history. `.git/hooks/pre-commit` run
 token. Git hooks are not copied by `git clone`; `~/work/server-config/README.md` says how to
 set them up again.
 
+## Search engines
+
+### What the site does
+
+Search engines find the site by following links to it and by reading `sitemap.xml` (named
+in `robots.txt`). `build.py` writes everything they use, from `site.toml` and the page
+headers, so nothing here needs editing by hand:
+
+- **Titles.** The home page's title is set in `source/pages/index.html`
+  ("Souvik Mandal – Mathematics (Topology and Geometry), IIT Madras"); every other page's
+  title gets "– Souvik Mandal, IIT Madras" added, so each result shows which Souvik Mandal
+  this is. Titles and `description:` lines (the text under a result) should name you and
+  keep to the facts on the pages.
+- **The name as the home page's heading.** On the home page the name at the top is the
+  main heading (`<h1>`); "About" is a second-level heading styled like a page title
+  (`class="page-title"`). On the other pages the name links to the home page.
+- **A description of you for search engines** (schema.org, as JSON-LD, on the home page
+  only, not shown on the page): the site's name (`WebSite`, which Google uses as the site
+  name in results) and a `ProfilePage` about you (`Person`): name, photo, position,
+  institution and department with their web addresses, places studied (`studied_at`),
+  awards (`awards`), research areas (`research_areas`), ORCID iD, and the ORCID and Google
+  Scholar profiles as the same person (`sameAs`). All of it comes from `site.toml`; keep it
+  in line with the pages. The ORCID and Google Scholar icons also carry `rel="me"`.
+- **Other tags:** a canonical address on every page (the home page is
+  `https://ssouvikmandal.github.io/`, not `.../index.html`), `max-image-preview:large` (so
+  results may show the photo in full size), link-preview tags, `noindex` on the 404 page,
+  and `sitemap.xml` with each page's last-updated date. `robots.txt` keeps search engines
+  out of `source/` and `tools/`. The browser icon (`favicon.ico`, `images/favicon-192.png`)
+  is also the icon Google shows beside results; keep its file names.
+
+### What only you can do
+
+These steps need your own accounts; they matter more than anything in the code.
+
+1. **Google Search Console** (<https://search.google.com/search-console>): add a property
+   of type "URL prefix" with `https://ssouvikmandal.github.io/` (the "Domain" type does not
+   work for a `github.io` address). Choose the verification method "HTML tag", copy only
+   the code inside `content="…"`, put it in `site.toml` under `[search]` as
+   `google_site_verification = "…"`, run `python3 build.py --check`, publish, wait a
+   minute and press "Verify". Then, in Search Console: Sitemaps → enter `sitemap.xml` →
+   Submit; and URL inspection → enter the home page address → "Request indexing". Keep the
+   code in `site.toml`: removing it ends the verification.
+2. **Bing Webmaster Tools** (<https://www.bing.com/webmasters>), which also serves
+   DuckDuckGo and Yahoo: sign in and choose "Import from Google Search Console", or verify
+   with its HTML tag (`bing_site_verification`, the code from `msvalidate.01`).
+3. **Links to the site** from pages that already rank for your name: the "Homepage" field
+   of the Google Scholar profile, "Websites & social links" on the ORCID record, the
+   department's page about you if it has one, GitHub and other profiles, and your CV and
+   email signature.
+4. **The old Google Site** has the same text and an older place in search results. Replace
+   its content with one line saying that the site has moved, with a link to
+   `https://ssouvikmandal.github.io`, and leave it published for some months, so that
+   visitors and search engines follow the link.
+
+New sites usually appear in Google within days to a few weeks after these steps; the
+position in results for a given search cannot be set from the site itself.
+
 ## Email addresses and spam
 
 Programs that collect addresses for spam read web pages and public repositories looking for
@@ -308,8 +370,10 @@ this row.
 ## Moving the site
 
 The pages link to each other with relative links, so the published files work in any
-location without changes. Only `sitemap.xml`, `robots.txt`, the link-preview tags and the
-404 page contain the full address, and all of them come from one line in `site.toml`.
+location without changes. Only `sitemap.xml`, `robots.txt`, the canonical, link-preview
+and search-engine tags and the 404 page contain the full address, and all of them come from
+one line in `site.toml`. After a move, add the new address to Google Search Console as
+well and submit its sitemap (see [Search engines](#search-engines)).
 
 ### Your own domain (e.g. `www.souvikmandal.com`) on GitHub Pages
 

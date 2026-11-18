@@ -200,15 +200,18 @@ a[href$=".pdf"]::after {
   }
 }
 .brand-text { min-width: 0; }
+/* The name: the main heading (h1) on the home page, a link to it on the other pages. */
 .name {
   display: inline-block;
+  margin: 0;
   color: var(--text);
   text-decoration: none;
   font-size: 1.75rem;
+  font-weight: 400;
   line-height: 1.15;
   letter-spacing: .01em;
 }
-.name:hover { color: var(--accent); }
+a.name:hover { color: var(--accent); }
 @media (min-width: 40em) {
   .name { font-size: 2.25rem; }
 }
@@ -318,7 +321,7 @@ h1, h2, h3 {
   line-height: 1.25;
   color: var(--text);
 }
-h1 {
+h1, .page-title {         /* .page-title: an h2 that looks like a page's main heading */
   font-size: 1.75rem;
   margin: 0 0 1.25rem;
   letter-spacing: .005em;
@@ -333,7 +336,7 @@ h3 {
   margin: 1.8rem 0 .6rem;
 }
 @media (min-width: 40em) {
-  h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+  h1, .page-title { font-size: 2rem; margin-bottom: 1.5rem; }
 }
 
 p { margin: 0 0 1em; }

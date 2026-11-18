@@ -26,6 +26,11 @@ which are filled in from site.toml:
 Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
 MathJax from assets/mathjax/.
 
+For search engines (README.md, "Search engines"): titles other than the home page's get
+"– <name>, <institution>" added; the name at the top is the <h1> of the home page and a
+link elsewhere; the home page carries a schema.org description of the site and its owner
+(home_jsonld) and the Search Console / Bing codes from [search] in site.toml.
+
 Email addresses never appear whole in the HTML, which keeps them away from the programs
 that collect addresses for spam: the visible text contains a hidden decoy ("nospam." after
 the @, which visitors neither see nor copy), and the mailto: link is assembled from a
@@ -184,14 +189,15 @@ def placeholders(cfg):
         rows.append(f"  <dt>Email ({esc(label)}):</dt>\n  <dd>{email_link(address)}{email_text(address)}</a></dd>")
     values["email_rows"] = "\n".join(rows)
     # The icons at the top of every page: ORCID record, Google Scholar profile, email.
+    # rel="me" says that these profiles belong to the owner of this site.
     icons = []
     if p.get("orcid"):
         orcid_id = p["orcid"].rstrip("/").rsplit("/", 1)[-1]
-        icons.append(f'<a class="icon" href="{esc(p["orcid"])}" title="ORCID record: {esc(orcid_id)}" '
+        icons.append(f'<a class="icon" href="{esc(p["orcid"])}" rel="me" title="ORCID record: {esc(orcid_id)}" '
                      f'aria-label="ORCID record of {esc(p["name"])}">'
                      '<img src="images/orcid-id.svg" alt="" width="24" height="24"></a>')
     if p.get("google_scholar"):
-        icons.append(f'<a class="icon" href="{esc(p["google_scholar"])}" title="Google Scholar profile" '
+        icons.append(f'<a class="icon" href="{esc(p["google_scholar"])}" rel="me" title="Google Scholar profile" '
                      f'aria-label="Google Scholar profile of {esc(p["name"])}">'
                      '<img src="images/scholar.svg" alt="" width="24" height="24"></a>')
     icons.append(email_link(main_email, f'Email {p["name"]}').replace('class="email"', 'class="icon"')
@@ -264,26 +270,93 @@ def nav_html(cfg, current):
     return "\n".join(lines)
 
 
-def person_jsonld(cfg):
+def name_parts(name):
+    """("Souvik", "Mandal") from "Souvik Mandal": given names, then the family name."""
+    parts = name.split()
+    return (" ".join(parts[:-1]), parts[-1]) if len(parts) > 1 else ("", name)
+
+
+def home_jsonld(cfg, title, description, updated):
+    """The description of the site and of its owner that search engines read from the home
+    page (schema.org, in JSON-LD): a WebSite (which gives Google the site's name) and a
+    ProfilePage whose main subject is the Person. Everything comes from site.toml."""
     p, site = cfg["person"], cfg["site"]
+    home = site["url"] + "/"
+    given, family = name_parts(p["name"])
+    w, h = image_size(ROOT / PHOTO)
+    institution = {"@type": "CollegeOrUniversity",
+                   "name": p.get("institution_full_name") or p["institution"]}
+    if p.get("institution_full_name") and p["institution_full_name"] != p["institution"]:
+        institution["alternateName"] = p["institution"]
+    if p.get("institution_url"):
+        institution["url"] = p["institution_url"]
+    department = {"@type": "Organization", "name": f'{p["department"]}, {p["institution"]}'}
+    if p.get("department_url"):
+        department["url"] = p["department_url"]
+    institution["department"] = department
+    person = {
+        "@type": "Person",
+        "@id": home + "#person",
+        "name": p["name"],
+        "givenName": given,
+        "familyName": family,
+        "url": home,
+        "image": {"@type": "ImageObject", "url": f'{site["url"]}/{PHOTO}',
+                  "width": w, "height": h},
+        "description": description,
+        "jobTitle": p["position"],
+        "affiliation": institution,
+    }
+    if not given:
+        del person["givenName"]
+    if p.get("studied_at"):
+        person["alumniOf"] = [{"@type": "CollegeOrUniversity", "name": n, "url": u} if u else
+                              {"@type": "CollegeOrUniversity", "name": n}
+                              for n, u in p["studied_at"]]
+    if p.get("awards"):
+        person["award"] = p["awards"]
+    if p.get("research_areas"):
+        person["knowsAbout"] = p["research_areas"]
+    same_as = [u for u in (p.get("orcid"), p.get("google_scholar")) if u]
+    if same_as:
+        person["sameAs"] = same_as
+    if p.get("orcid"):
+        person["identifier"] = {"@type": "PropertyValue", "propertyID": "ORCID",
+                                "value": p["orcid"].rstrip("/").rsplit("/", 1)[-1]}
     data = {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": p["name"],
-        "url": site["url"] + "/",
-        "image": f'{site["url"]}/{PHOTO}',
-        "jobTitle": p["position"],
-        "affiliation": {"@type": "Organization", "name": p["institution"],
-                        "department": {"@type": "Organization", "name": p["department"]}},
-        "sameAs": [u for u in (p.get("orcid"), p.get("google_scholar")) if u],
+        "@graph": [
+            {"@type": "WebSite", "@id": home + "#website", "url": home, "name": p["name"],
+             "inLanguage": site.get("language", "en"), "publisher": {"@id": home + "#person"}},
+            {"@type": "ProfilePage", "@id": home, "url": home, "name": title,
+             "inLanguage": site.get("language", "en"), "isPartOf": {"@id": home + "#website"},
+             "dateModified": updated.isoformat(), "mainEntity": person},
+        ],
     }
-    if p.get("orcid"):
-        data["identifier"] = {"@type": "PropertyValue", "propertyID": "ORCID",
-                              "value": p["orcid"].rstrip("/").rsplit("/", 1)[-1]}
-    if p.get("research_areas"):
-        data["knowsAbout"] = p["research_areas"]
+    if site.get("created"):
+        data["@graph"][1]["dateCreated"] = str(site["created"])
     text = json.dumps(data, ensure_ascii=False, indent=2).replace("</", "<\\/")
     return f'<script type="application/ld+json">\n{text}\n</script>\n'
+
+
+def home_meta(cfg):
+    """Extra tags for the home page: first and last name for link previews, and the codes
+    that prove ownership to Google Search Console and Bing Webmaster Tools."""
+    given, family = name_parts(cfg["person"]["name"])
+    tags = ""
+    if given:
+        tags += f'<meta property="profile:first_name" content="{attr(given)}">\n'
+    tags += f'<meta property="profile:last_name" content="{attr(family)}">\n'
+    search = cfg.get("search", {})
+    for key, name in (("google_site_verification", "google-site-verification"),
+                      ("bing_site_verification", "msvalidate.01")):
+        code = str(search.get(key, "")).strip()
+        if code:
+            if not re.fullmatch(r"[A-Za-z0-9_-]+", code):
+                fail(f"site.toml: [search] {key} should be only the code from content=\"…\", "
+                     f"not the whole tag: {code!r}")
+            tags += f'<meta name="{name}" content="{code}">\n'
+    return tags
 
 
 def render(cfg, template, values, file, meta, body, updated):
@@ -294,7 +367,9 @@ def render(cfg, template, values, file, meta, body, updated):
     plain = {k: str(person[k]) for k in ("name", "position", "department", "institution")}
     title = fill(meta["title"], plain, where)
     if not is_home and person["name"] not in title:
-        title = f'{title} – {person["name"]}'
+        # "Publications – Souvik Mandal, IIT Madras": the name with the institution tells
+        # search engines (and readers of a results page) which Souvik Mandal this is.
+        title = f'{title} – {person["name"]}, {person["institution"]}'
     description = fill(meta["description"], plain, where)
     head_extra = ""
     if meta.get("math", "auto") == "yes" or (meta.get("math", "auto") == "auto"
@@ -302,7 +377,7 @@ def render(cfg, template, values, file, meta, body, updated):
         head_extra += ('<script src="assets/mathjax-config.js"></script>\n'
                        '<script defer src="assets/mathjax/tex-chtml.js"></script>\n')
     if is_home:
-        head_extra += person_jsonld(cfg)
+        head_extra += home_meta(cfg) + home_jsonld(cfg, title, description, updated)
     base_path = urllib.parse.urlsplit(site["url"]).path.rstrip("/") + "/"
     since = int(site.get("since", updated.year))
     page_values = dict(values)
@@ -318,7 +393,13 @@ def render(cfg, template, values, file, meta, body, updated):
         "head_extra": head_extra,
         # The 404 page is shown at any address, so its links must start from the site root.
         "base": f'<base href="{html.escape(base_path)}">\n' if is_404 else "",
-        "robots": '<meta name="robots" content="noindex">\n' if is_404 else "",
+        # Search engines may show the photo and preview images in full size.
+        "robots": ('<meta name="robots" content="noindex">\n' if is_404 else
+                   '<meta name="robots" content="max-image-preview:large">\n'),
+        # The name at the top of every page: the main heading on the home page (so that
+        # search engines see the name as its title), a link to the home page elsewhere.
+        "name_heading": (f'<h1 class="name">{html.escape(person["name"])}</h1>' if is_home else
+                         f'<a class="name" href="index.html">{html.escape(person["name"])}</a>'),
         "updated": f"{updated.day} {MONTHS[updated.month - 1]} {updated.year}",
         # "2026", or "2026–2028" for a page last updated in a later year
         "copyright_years": (str(since) if updated.year <= since else f"{since}–{updated.year}"),

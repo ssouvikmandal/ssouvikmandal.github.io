@@ -4,12 +4,15 @@
 
 [site]
 # Full address of the published site, without a trailing slash. Only sitemap.xml,
-# robots.txt, the 404 page and the link-preview tags use it; the pages link to each
-# other with relative links, so they work anywhere. Change it when the site moves.
+# robots.txt, the 404 page and the tags for search engines and link previews use it;
+# the pages link to each other with relative links, so they work anywhere. Change it
+# when the site moves.
 url = "https://ssouvikmandal.github.io"
 # The year the site started: the footer shows "© 2026 Souvik Mandal", or "© 2026–2028"
 # once a page has been updated in a later year.
 since = 2026
+# The day the site was first published (for search engines: schema.org "dateCreated").
+created = 2026-11-18
 language = "en"
 
 [person]
@@ -31,8 +34,19 @@ email = "ssouvik.xyz [at] gmail.com"
 other_emails = [["IIT Madras", "ma22d014 [at] smail.iitm.ac.in"]]
 orcid = "https://orcid.org/0009-0004-0429-3063"
 google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
-# Research areas, for search engines (schema.org "knowsAbout"); not shown on the pages.
+# For search engines only: these go into the description of you that Google and other
+# search engines read from the home page (schema.org; see README.md, "Search engines").
+# They are not shown on the pages, so keep them in line with what the pages say.
+institution_full_name = "Indian Institute of Technology Madras"
+institution_url = "https://www.iitm.ac.in/"
+department_url = "https://math.iitm.ac.in/"
 research_areas = ["Topology", "Geometry"]
+# Places you studied before, each as ["name", "web address"] (schema.org "alumniOf").
+studied_at = [
+  ["Indian Statistical Institute, Bengaluru", "https://www.isibang.ac.in/"],
+  ["St. Xavier’s College, Kolkata", "https://sxccal.edu/"],
+]
+awards = ["Prime Minister’s Research Fellowship (PMRF), 9th cycle, 2022"]
 # Postal address, one line per entry, as shown on the Contact page.
 address = [
   "Souvik Mandal",
@@ -42,6 +56,13 @@ address = [
 ]
 # The photo is always images/photo.jpg and the CV is always cv.pdf: to update them,
 # replace those files (keep the names) and run python3 build.py.
+
+[search]
+# Ownership codes for Google Search Console and Bing Webmaster Tools ("HTML tag" method):
+# paste only the code from content="…" of the tag they show, then run python3 build.py
+# and publish. Leave "" when not used. See README.md, "Search engines".
+google_site_verification = ""
+bing_site_verification = ""
 
 # The menu at the top of every page, in this order. Each entry is a page in
 # source/pages/ that is published under the same file name.
