@@ -31,6 +31,12 @@ For search engines (README.md, "Search engines"): titles other than the home pag
 link elsewhere; the home page carries a schema.org description of the site and its owner
 (home_jsonld) and the Search Console / Bing codes from [search] in site.toml.
 
+Visitor statistics (README.md, "Visitor statistics"): when [analytics] goatcounter in
+site.toml names a GoatCounter account, every page loads assets/goatcounter/count.v5.js,
+which counts the visit without cookies, and count_clicks() marks downloads, links to
+other websites and email links so that clicks on them are counted too. Switching it on or
+off does not move the "Last updated" dates.
+
 Email addresses never appear whole in the HTML, which keeps them away from the programs
 that collect addresses for spam: the visible text contains a hidden decoy ("nospam." after
 the @, which visitors neither see nor copy), and the mailto: link is assembled from a
@@ -72,6 +78,9 @@ DATES = SOURCE / "last-updated.json"
 PHOTO = "images/photo.jpg"
 CV = "cv.pdf"
 OG_IMAGE = "images/og-image.png"
+# GoatCounter's counting script, version 5, kept here unchanged (ISC licence; see README.md,
+# "Visitor statistics").
+GOATCOUNTER_JS = "assets/goatcounter/count.v5.js"
 MATH_PATTERN = re.compile(r"(?<!\\)\$|\\\(|\\\[")
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
           "September", "October", "November", "December"]
@@ -290,6 +299,52 @@ def date_time(value):
     return value.replace(microsecond=0).isoformat()
 
 
+def goatcounter_code(cfg):
+    """The GoatCounter account name from site.toml, or "" when counting is off."""
+    code = str(cfg.get("analytics", {}).get("goatcounter", "")).strip().lower()
+    if code and not re.fullmatch(r"[a-z0-9][a-z0-9-]*", code):
+        fail(f"site.toml: [analytics] goatcounter should be only the account name, e.g. "
+             f"\"souvikmandal\" for souvikmandal.goatcounter.com, not {code!r}")
+    return code
+
+
+def count_clicks(page, cfg):
+    """Mark the links whose clicks GoatCounter counts (as "events"): links to PDF files
+    (downloads), to other websites, and email links. Each gets a name and a title of our
+    own, so that GoatCounter never receives the text of an email link (the address)."""
+    p = cfg["person"]
+    emails = {scramble(real_address(p["email"])): ("email", "Email")}
+    for label, written in p.get("other_emails", []):
+        emails[scramble(real_address(written))] = (f"email: {label}", f"Email ({label})")
+    own_host = urllib.parse.urlsplit(cfg["site"]["url"]).hostname
+
+    def mark(m):
+        tag, inner = m.group(1), m.group(2)
+        if "data-goatcounter-click" in tag:
+            return m.group(0)
+        attrs = dict(re.findall(r'([\w-]+)="([^"]*)"', tag))
+        href = html.unescape(attrs.get("href", ""))
+        text = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", inner)).split())
+        title = html.unescape(attrs.get("aria-label") or attrs.get("title") or text)
+        if "data-mail" in attrs:
+            name, title = emails.get(html.unescape(attrs["data-mail"]), ("email", "Email"))
+        elif href.lower().endswith(".pdf") and "://" not in href:
+            name = f"download: {href}"
+        elif href.startswith(("http://", "https://")):
+            u = urllib.parse.urlsplit(href)
+            if u.hostname == own_host:
+                return m.group(0)
+            name = "link: " + (u.hostname or "").removeprefix("www.") + u.path.rstrip("/") \
+                   + (f"?{u.query}" if u.query else "")
+        else:
+            return m.group(0)
+        extra = (f' data-goatcounter-click="{attr(name[:200])}"'
+                 f' data-goatcounter-title="{attr(title[:200])}"')
+        return f"{tag[:-1]}{extra}>{inner}</a>"
+
+    return re.sub(r"(<a\b[^>]*>)(.*?)</a>", mark, page, flags=re.S)
+
+
 def name_parts(name):
     """("Souvik", "Mandal") from "Souvik Mandal": given names, then the family name."""
     parts = name.split()
@@ -382,9 +437,10 @@ def home_meta(cfg):
     return tags
 
 
-def render(cfg, template, values, file, meta, body, updated, modified):
+def render(cfg, template, values, file, meta, body, updated, modified, analytics=True):
     """`updated`: the date of the page's last change (footer); `modified`: the same moment
-    as date and time with time zone (for search engines)."""
+    as date and time with time zone (for search engines). `analytics=False` leaves out the
+    visitor counter, which does not count as a change of the page."""
     site, person = cfg["site"], cfg["person"]
     is_home, is_404 = file == "index.html", file == "404.html"
     where = f"source/pages/{file}"
@@ -403,6 +459,10 @@ def render(cfg, template, values, file, meta, body, updated, modified):
                        '<script defer src="assets/mathjax/tex-chtml.js"></script>\n')
     if is_home:
         head_extra += home_meta(cfg) + home_jsonld(cfg, title, description, modified)
+    code = goatcounter_code(cfg) if analytics else ""
+    if code:
+        head_extra += (f'<script data-goatcounter="https://{code}.goatcounter.com/count" '
+                       f'async src="{GOATCOUNTER_JS}"></script>\n')
     base_path = urllib.parse.urlsplit(site["url"]).path.rstrip("/") + "/"
     since = int(site.get("since", updated.year))
     page_values = dict(values)
@@ -411,6 +471,10 @@ def render(cfg, template, values, file, meta, body, updated, modified):
         "title": attr(title),
         "description": attr(description),
         "canonical": page_url(cfg, file),
+        # None on the 404 page: it is shown at many addresses (and the visitor counter
+        # then records the address that was not found).
+        "canonical_link": ("" if is_404 else
+                           f'<link rel="canonical" href="{html.escape(page_url(cfg, file))}">\n'),
         "og_type": "profile" if is_home else "website",
         "og_image": f'{site["url"]}/{OG_IMAGE}',
         "nav": nav_html(cfg, file),
@@ -430,7 +494,8 @@ def render(cfg, template, values, file, meta, body, updated, modified):
         "copyright_years": (str(since) if updated.year <= since else f"{since}–{updated.year}"),
         "updated_iso": updated.isoformat(),
     })
-    return fill(template, page_values, "source/template.html")
+    page = fill(template, page_values, "source/template.html")
+    return count_clicks(page, cfg) if code else page
 
 
 def build(now):
@@ -457,7 +522,7 @@ def build(now):
         meta, body = read_page(PAGES / file)
         # Fingerprint the page without its date, to tell whether it changed.
         probe = render(cfg, template, values, file, meta, body, datetime.date(2000, 1, 1),
-                       "2000-01-01T00:00:00+00:00")
+                       "2000-01-01T00:00:00+00:00", analytics=False)
         digest = hashlib.sha256(probe.encode()).hexdigest()
         old = dates.get(file, {})
         if old.get("hash") == digest:
@@ -542,7 +607,8 @@ def check(cfg, files, external):
                 problems.append(f"{file}: link to {link}, but {path} does not exist")
             elif parts.fragment and path in pages and parts.fragment not in pages[path].ids:
                 problems.append(f"{file}: link to {link}, but {path} has no id {parts.fragment!r}")
-    for f in ("favicon.ico", "images/favicon-192.png", "images/apple-touch-icon.png", "assets/email.js", OG_IMAGE, PHOTO):
+    for f in ("favicon.ico", "images/favicon-192.png", "images/apple-touch-icon.png", "assets/email.js", OG_IMAGE, PHOTO,
+              *([GOATCOUNTER_JS] if goatcounter_code(cfg) else [])):
         if not (ROOT / f).exists():
             problems.append(f"missing file: {f}")
     if external:

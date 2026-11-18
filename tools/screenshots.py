@@ -9,7 +9,8 @@ not load, images without alt text, and pages wider than the screen.
 Needs Playwright (on the author's server: ~/venvs/web/bin/python tools/screenshots.py ...).
 Without --url, the site is served from this folder at http://127.0.0.1:8765/ for the
 duration of the run. Either way the browser is not allowed to contact any other server than
-the site's own.
+the site's own. Requests to the visitor counter (GoatCounter, if set in site.toml) are
+stopped too, so that these checks are never counted, and reported as "counter" lines.
 """
 import argparse
 import functools
@@ -47,6 +48,8 @@ def main():
     with open(ROOT / "site.toml", "rb") as f:
         cfg = tomllib.load(f)
     pages = args.pages or [n["file"] for n in cfg["nav"]] + ["404.html", "no-such-page/"]
+    code = str(cfg.get("analytics", {}).get("goatcounter", "")).strip().lower()
+    counter = f"https://{code}.goatcounter.com/count" if code else ""
     args.out.mkdir(parents=True, exist_ok=True)
 
     class NotFound(Quiet):          # imitate GitHub Pages: unknown addresses get 404.html
@@ -80,11 +83,14 @@ def main():
             ctx = browser.new_context(**opts)
             for page_name in pages:
                 page = ctx.new_page()
-                outside, failed, errors = [], [], []
+                outside, failed, errors, counted = [], [], [], []
 
                 def route(r):
                     if r.request.url.startswith(base):
                         r.continue_()
+                    elif counter and r.request.url.startswith(counter):
+                        counted.append(r.request.url)       # stopped: checks are not counted
+                        r.abort()
                     else:
                         outside.append(r.request.url)
                         r.abort()
@@ -124,6 +130,8 @@ def main():
                 if info["h1"] != 1:
                     problems.append(f"{label}: {info['h1']} h1 headings (expected 1)")
                 print(f"{label}: {info['title']!r}; fonts: {', '.join(sorted(set(info['fonts']))) or 'none'}")
+                for u in counted:
+                    print(f"  counter (stopped, not counted): {u.split('&rnd=')[0]}")
                 page.close()
             ctx.close()
         browser.close()

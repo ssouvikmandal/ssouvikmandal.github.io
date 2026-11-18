@@ -71,6 +71,13 @@ google_verification_file = "google59317c9659984622.html"
 google_site_verification = ""
 bing_site_verification = ""
 
+[analytics]
+# Visitor statistics with GoatCounter (https://www.goatcounter.com): no cookies and no
+# personal data. Write the account name, the part before ".goatcounter.com" in the
+# address of your GoatCounter dashboard, then run python3 build.py and publish. ""
+# switches counting off. See README.md, "Visitor statistics".
+goatcounter = ""
+
 # The menu at the top of every page, in this order. Each entry is a page in
 # source/pages/ that is published under the same file name.
 [[nav]]

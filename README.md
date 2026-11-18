@@ -6,9 +6,10 @@ the Google Site's text, with a few typing errors corrected; the Publications pag
 from arXiv.
 
 The published site is plain HTML and CSS with relative links. Fonts, icons and MathJax are
-stored here, and the site uses no outside services, trackers or cookies. The only scripts
-are MathJax (on pages with formulas) and a few lines in `assets/email.js` that protect the
-email addresses; everything works without them. A page is only regenerated
+stored here, and the site uses no cookies and no trackers. The only scripts are MathJax (on
+pages with formulas), a few lines in `assets/email.js` that protect the email addresses,
+and, when it is switched on, GoatCounter's small visitor counter, the one outside service
+(see [Visitor statistics](#visitor-statistics)); everything works without them. A page is only regenerated
 when you run `python3 build.py`, which needs Python 3.11 or later and nothing else.
 
 ## Contents
@@ -18,6 +19,7 @@ when you run `python3 build.py`, which needs Python 3.11 or later and nothing el
   teaching entry · a paper · a talk · a new section · formulas
 - [Publishing](#publishing)
 - [Search engines](#search-engines): what the site does · what only you can do
+- [Visitor statistics](#visitor-statistics) (GoatCounter)
 - [Email addresses and spam](#email-addresses-and-spam)
 - [Placeholders](#placeholders)
 - [Moving the site](#moving-the-site): your own domain · a university server
@@ -45,6 +47,7 @@ images/LICENSES.txt       ← where the ORCID, Google Scholar, ResearchGate and 
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
 assets/email.js           ← turns the protected email links into mailto: links
+assets/goatcounter/count.v5.js ← GoatCounter's visitor counter (used when switched on)
 assets/fonts/             ← the text font (New Computer Modern), see its README.txt
 assets/mathjax/, assets/mathjax-config.js   ← MathJax for formulas, see README-SITE.txt
 sitemap.xml, robots.txt   ← for search engines (generated)
@@ -293,7 +296,7 @@ headers, so nothing here needs editing by hand:
   profile also says when the site was first published (`created` in `site.toml`) and when
   the home page last changed (kept in `source/last-updated.json`), both as date, time and
   time zone, e.g. `2026-11-18T10:31:41+00:00`: Google marks plain dates there as invalid.
-- **Other tags:** a canonical address on every page (the home page is
+- **Other tags:** a canonical address on every page but the 404 page (the home page is
   `https://ssouvikmandal.github.io/`, not `.../index.html`), `max-image-preview:large` (so
   results may show the photo in full size), link-preview tags, `noindex` on the 404 page,
   and `sitemap.xml` with each page's last-updated date. `robots.txt` keeps search engines
@@ -329,6 +332,39 @@ These steps need your own accounts; they matter more than anything in the code.
 
 New sites usually appear in Google within days to a few weeks after these steps; the
 position in results for a given search cannot be set from the site itself.
+
+## Visitor statistics
+
+Visits are counted with GoatCounter (<https://www.goatcounter.com>), free for personal
+sites, when `[analytics] goatcounter` in `site.toml` holds the account name (the part
+before `.goatcounter.com` in the dashboard's address); `""` switches it off. After a
+change run `python3 build.py --check` and publish. Switching it on or off does not change
+the "Last updated" dates.
+
+- **What you see** in the dashboard (`https://ACCOUNT.goatcounter.com`, after logging in):
+  visits per page and per day, where visitors came from (Google, Google Scholar, ORCID,
+  ResearchGate, …), countries, browsers, systems and screen sizes. Clicks are counted as
+  "events": `download: cv.pdf`, `link: arxiv.org/abs/…` (the paper links),
+  `link: orcid.org/…`, `link: scholar.google.com/…`, `link: researchgate.net/…`, `email`
+  (the main address) and `email: IIT Madras`. Visits to an address that does not exist
+  show that address with the title "Page not found", which helps to find broken links.
+  The home page counts as `/`, whether it was opened as `/` or `/index.html`.
+- **What it does not do**: no cookies, nothing stored in the visitor's browser, no
+  personal data; GoatCounter keeps only totals (it does not keep IP addresses), so no
+  cookie banner is needed (GoatCounter's explanation: <https://www.goatcounter.com/help/gdpr>).
+  `build.py` gives every counted link its own name and title (`count_clicks()`), so the
+  email addresses are never sent to GoatCounter. Visits from `localhost`, from the
+  author's checks (`tools/screenshots.py` stops them) and from programs that identify as
+  automated browsers are not counted. Ad blockers stop the counter for some visitors, so
+  the real numbers are somewhat higher.
+- **Your own visits**: open `https://ssouvikmandal.github.io/#toggle-goatcounter` once in
+  each browser you use (on each computer and phone) and confirm; that browser is then no
+  longer counted. Doing it again counts it again.
+- **The script** `assets/goatcounter/count.v5.js` is GoatCounter's `count.v5.js` (ISC
+  licence, see its first lines), stored here unchanged and checked against the SHA-384
+  checksum GoatCounter publishes (<https://www.goatcounter.com/help/countjs-versions>). It
+  sends each visit to `https://ACCOUNT.goatcounter.com/count`. A stored copy never changes
+  by itself, and GoatCounter promises that this address keeps working with it.
 
 ## Email addresses and spam
 
@@ -491,7 +527,8 @@ every program with "403 Forbidden", so its link is skipped there (listed in
 
 Licences of what is included: the fonts are New Computer Modern by Antonis Tsolomitis
 (GUST Font License, see `assets/fonts/`); MathJax 4.1.3 and its New Computer Modern math
-font are under the Apache License 2.0 (see `assets/mathjax/`). The texts, the photo and
+font are under the Apache License 2.0 (see `assets/mathjax/`); GoatCounter's `count.v5.js`
+is under the ISC licence (see its first lines). The texts, the photo and
 the CV are © Souvik Mandal. The IIT Madras logo belongs to IIT Madras; it is the logo
 file used on the old Google Site, reduced from 1200 to 128 pixels (shape and colours
 unchanged).
