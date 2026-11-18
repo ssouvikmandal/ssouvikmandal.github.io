@@ -75,6 +75,8 @@ def main():
             opts = dict(SIZES[size])
             if size == "computer":
                 opts["device_scale_factor"] = args.scale
+            else:   # identify as a phone browser too, as assets/email.js looks at that
+                opts["user_agent"] = pw.devices["iPhone 13"]["user_agent"]
             ctx = browser.new_context(**opts)
             for page_name in pages:
                 page = ctx.new_page()
