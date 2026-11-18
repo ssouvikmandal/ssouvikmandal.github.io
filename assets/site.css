@@ -341,6 +341,7 @@ p { margin: 0 0 1em; }
 main p, main li { hyphens: manual; }   /* ragged right: no automatic hyphenation */
 
 strong, b { font-weight: 700; }
+.field { font-variant-caps: small-caps; letter-spacing: .03em; }   /* research areas on the home page */
 .nowrap { white-space: nowrap; }
 em, i, cite { font-style: italic; }
 
