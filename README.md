@@ -21,7 +21,6 @@ when you run `python3 build.py`, which needs Python 3.11 or later and nothing el
 - [Search engines](#search-engines): what the site does · what only you can do
 - [Visitor statistics](#visitor-statistics) (GoatCounter)
 - [Email addresses and spam](#email-addresses-and-spam)
-- [Placeholders](#placeholders)
 - [Moving the site](#moving-the-site): your own domain · a university server
 - [The icons, the motif and the drawings in the margins](#the-icons-the-motif-and-the-drawings-in-the-margins)
 - [Tools and licences](#tools-and-licences)
@@ -34,7 +33,7 @@ source/pages/*.html       ← the text of each page (edit these)
 source/template.html      ← the frame around every page: head, header, menu, footer
 build.py                  ← turns the two above into the published pages
 index.html, cv.html, …    ← the published pages (generated: do not edit by hand)
-cv.pdf                    ← your CV (at present a placeholder, see "Placeholders")
+cv.pdf                    ← your CV (two pages; made from a LaTeX source kept privately, see "The CV")
 images/photo.jpg          ← your photo
 images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
 images/orcid-id.svg, images/scholar.svg, images/researchgate.svg, images/email.svg
@@ -54,7 +53,6 @@ sitemap.xml, robots.txt   ← for search engines (generated)
 404.html                  ← the "page not found" page (generated)
 source/last-updated.json  ← the "last updated" date of each page (kept by build.py)
 source/motifs/            ← the three motif drawings (torus, Hopf fibration, trefoil knot)
-source/placeholders/      ← the LaTeX source of the CV placeholder
 source/archive/           ← earlier versions of pages, not published (see its README.md)
 tools/                    ← optional helpers; they need extra Python packages, build.py does not
 ```
@@ -111,11 +109,18 @@ the home page is ordinary text: edit it in `source/pages/index.html`.
 
 ### The CV
 
-Replace `cv.pdf` with the new file (same name) and run `python3 build.py`. Every link to the
-CV points to `cv.pdf`, so nothing else changes. (At present `cv.pdf` is a placeholder; see
-[Placeholders](#placeholders).) Everything committed here stays public in the repository's
-history, even after it is replaced, so check a CV for private details (date of birth, phone
-number, home address) before committing it.
+`cv.pdf` is a two-page CV in the site's style (same font and accent colour): the IIT Madras
+logo and linked ORCID, Google Scholar and email icons at the top, then research interests,
+education, preprints, fellowships and awards, teaching, and conferences. Its LaTeX source is
+not in this repository: it is kept with the owner's private files (`~/work/cv/` on the
+author's server, with its own README), built with `lualatex cv.tex` (run twice).
+
+To update it, edit and rebuild the source, replace `cv.pdf` here with the new file (same
+name) and run `python3 build.py --check`. Every link to the CV points to `cv.pdf`, so nothing
+else changes; GoatCounter counts its downloads as `download: cv.pdf`. Keep its content in
+line with the pages (publications, teaching, conferences). Everything committed here stays
+public in the repository's history, even after it is replaced, so check a CV for private
+details (date of birth, phone number, home address) before committing it.
 
 ### The photo
 
@@ -398,17 +403,6 @@ Which kind of device a visitor uses is read from the browser's description of it
 
 Never write an address in plain form in any file of this repository, including the README
 and commit messages: everything here is public.
-
-## Placeholders
-
-| File | Placeholder for | Replace it by |
-|---|---|---|
-| `cv.pdf` | the CV (the October 2024 CV from the Google Site is deliberately not published) | overwriting `cv.pdf` with the new CV, then `python3 build.py`, commit, push |
-
-The placeholder is one page saying that the CV will be added soon; its source is
-`source/placeholders/cv-placeholder.tex` (`lualatex cv-placeholder.tex`). Every link already
-points to `cv.pdf`, so replacing the file is enough. When the real CV is in place, delete
-this row.
 
 ## Moving the site
 
