@@ -302,12 +302,15 @@ These steps need your own accounts; they matter more than anything in the code.
 
 1. **Google Search Console** (<https://search.google.com/search-console>): add a property
    of type "URL prefix" with `https://ssouvikmandal.github.io/` (the "Domain" type does not
-   work for a `github.io` address). Choose the verification method "HTML tag", copy only
-   the code inside `content="…"`, put it in `site.toml` under `[search]` as
-   `google_site_verification = "…"`, run `python3 build.py --check`, publish, wait a
-   minute and press "Verify". Then, in Search Console: Sitemaps → enter `sitemap.xml` →
-   Submit; and URL inspection → enter the home page address → "Request indexing". Keep the
-   code in `site.toml`: removing it ends the verification.
+   work for a `github.io` address). The site is verified with the method "HTML file": the
+   file's name is `google_verification_file` under `[search]` in `site.toml`, and
+   `build.py` writes the file (`google59317c9659984622.html`, one line naming itself) at
+   the top of the site. (The method "HTML tag" also works: put only the code inside
+   `content="…"` in `google_site_verification`.) After a change, run
+   `python3 build.py --check`, publish, wait a minute and press "Verify". Then, in Search
+   Console: Sitemaps → enter `sitemap.xml` → Submit; and URL inspection → enter the home
+   page address → "Request indexing". Keep the file (or code): removing it ends the
+   verification.
 2. **Bing Webmaster Tools** (<https://www.bing.com/webmasters>), which also serves
    DuckDuckGo and Yahoo: sign in and choose "Import from Google Search Console", or verify
    with its HTML tag (`bing_site_verification`, the code from `msvalidate.01`).

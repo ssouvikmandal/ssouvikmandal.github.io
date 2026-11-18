@@ -453,6 +453,13 @@ def build(today):
               "User-agent: *\nAllow: /\nDisallow: /source/\nDisallow: /tools/\n\n"
               f"Sitemap: {cfg['site']['url']}/sitemap.xml\n"),
              (ROOT / ".nojekyll", "")]
+    # Google Search Console's verification file: one line naming the file itself.
+    gfile = str(cfg.get("search", {}).get("google_verification_file", "")).strip()
+    if gfile:
+        if not re.fullmatch(r"google[0-9a-f]+\.html", gfile):
+            fail(f"site.toml: [search] google_verification_file should be a file name like "
+                 f"google1234abcd.html, not {gfile!r}")
+        extra.append((ROOT / gfile, f"google-site-verification: {gfile}"))
     for path, text in extra:
         if not path.exists() or path.read_text(encoding="utf-8") != text:
             path.write_text(text, encoding="utf-8")

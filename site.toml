@@ -58,9 +58,12 @@ address = [
 # replace those files (keep the names) and run python3 build.py.
 
 [search]
-# Ownership codes for Google Search Console and Bing Webmaster Tools ("HTML tag" method):
-# paste only the code from content="…" of the tag they show, then run python3 build.py
-# and publish. Leave "" when not used. See README.md, "Search engines".
+# Proof of ownership for Google Search Console (see README.md, "Search engines").
+# "HTML file" method (in use): the name of the file Google gives, e.g. "google1234abcd.html";
+# build.py writes that file. Keep it: deleting it ends the verification.
+google_verification_file = "google59317c9659984622.html"
+# "HTML tag" method, for Google and for Bing Webmaster Tools: only the code from
+# content="…" of the tag they show. Leave "" when not used.
 google_site_verification = ""
 bing_site_verification = ""
 
