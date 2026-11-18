@@ -37,7 +37,7 @@ images/logo-iit-madras.png ← the institution's logo beside the affiliation (se
 images/orcid-id.svg, images/scholar.svg, images/email.svg ← the ORCID, Google Scholar and
                           email icons at the top of every page
 images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
-images/og-image.png       ← the browser icons (a Hopf link) and the link preview
+images/og-image.png       ← the browser icons (a torus) and the link preview (Hopf fibration)
 images/LICENSES.txt       ← where the ORCID, Google Scholar and email icons and the logo come from
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
@@ -352,23 +352,30 @@ Google's blue; the email icon is the Feather Icons "mail" icon (MIT licence) on 
 in the accent colour. Leaving `orcid` or `google_scholar` empty in `site.toml` removes that
 icon. See `images/LICENSES.txt`.
 
-The browser icon and the link-preview picture show the **Hopf fibration**: the preview
-shows seven of its fibres (circles in $S^3$, stereographically projected to
-$\mathbb{R}^3$), linked with each other, as an over/under diagram; the browser icon shows
-two fibres, a Hopf link.
-Two other variants are ready in `source/motifs/`: a **torus** with meridians and parallels
-(hidden lines removed) and a **trefoil knot**. All of them are computed by
-`tools/draw_motifs.py` (Python with numpy); no image was copied from anywhere.
+The browser-tab icon (and the icon on phone home screens) is a **torus**, the outline of a
+tilted torus with its hole. In browsers that use the SVG icon (Chrome, Firefox, Edge) its
+lines turn light when the browser is in dark mode; `favicon.ico`, for the others (Safari),
+shows it on a small light tile so that it can be seen on dark tab bars as well.
 
-To switch to another variant, run (with Playwright installed)
+The link-preview picture shows the **Hopf fibration**: seven of its fibres (circles in
+$S^3$, stereographically projected to $\mathbb{R}^3$), linked with each other, as an
+over/under diagram. A third motif, a **trefoil knot**, is ready in `source/motifs/`. All of
+them are computed by `tools/draw_motifs.py` (Python with numpy); no image was copied from
+anywhere.
+
+To change the icons or the preview picture, run (with Playwright installed)
 
 ```bash
-~/venvs/web/bin/python tools/make_icons.py torus     # or knot, or hopf
+~/venvs/web/bin/python tools/make_icons.py torus                  # icons only
+~/venvs/web/bin/python tools/make_icons.py torus --preview hopf   # icons and preview picture
 ```
 
-which installs the browser icons and the link-preview picture. Without Playwright, copy
-`source/motifs/torus-icon.svg` to `images/favicon.svg`; the PNG icons and the preview
-picture then keep the old motif.
+Without Playwright, copy `source/motifs/NAME-icon.svg` to `images/favicon.svg`; the PNG
+icons then keep the old motif.
+
+Browsers keep tab icons for a long time. After changing them, raise the number in `?v=2`
+on the three icon lines in `source/template.html` (to `?v=3`, and so on) and rebuild, so
+that browsers fetch the new icons.
 
 On computer screens (at least 60em, about 960 pixels, wide) the empty parts of the page carry
 very faint drawings, also computed by `tools/draw_motifs.py`: a torus behind the menu and in
@@ -394,7 +401,7 @@ fontTools):
 | Tool | Does | Needs |
 |---|---|---|
 | `tools/draw_motifs.py` | draws the motif variants into `source/motifs/` and the margin drawings into `images/bg-*.svg` | numpy |
-| `tools/make_icons.py NAME` | installs a motif as the browser icons and in the link preview | Playwright |
+| `tools/make_icons.py NAME [--preview NAME]` | installs a motif as the browser and phone icons (and with `--preview` in the link preview) | Playwright |
 | `tools/make_fonts.py` | makes `assets/fonts/*.woff2` from TeX Live's New Computer Modern | fontTools, brotli, TeX Live |
 | `tools/screenshots.py DIR [--url URL]` | opens every page (of this folder, or of the published site with `--url`) at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
 

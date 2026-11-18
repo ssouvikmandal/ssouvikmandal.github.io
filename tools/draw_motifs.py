@@ -14,8 +14,9 @@ For each variant the script writes, into source/motifs/:
   <name>.svg          header version (thin lines)
   <name>-icon.svg     favicon version (fewer, thicker lines, readable at 16-32 px)
 
-The chosen motif (the Hopf fibration, whose icon is a Hopf link) is installed as the
-favicon and in the link-preview picture by tools/make_icons.py.
+tools/make_icons.py installs a motif's icon as the browser-tab and phone icons (since
+18 November 2026 the torus) and, when asked, a motif in the link-preview picture (the Hopf
+fibration).
 
 It also draws the very faint background drawings shown in the page margins on computer
 screens (assets/site.css sets their position and faintness):
@@ -218,7 +219,7 @@ def visible_on_torus(points, normals, f, view, steps=400, reach=4.0):
 def torus(icon=False):
     R, r = 1.0, 0.42
     f, point, normal = torus_surface(R, r)
-    rot = rotation(-0.95 if icon else -1.08, 0.0, 0.32)
+    rot = rotation(-0.80 if icon else -1.08, 0.0, 0.32)
     view = rot.T @ np.array([0, 0, 1.0])        # direction towards the viewer, model coords
     groups = []
     n_mer, n_par = (0, 0) if icon else (20, 6)
@@ -247,7 +248,7 @@ def torus(icon=False):
         xy, _ = project(P, rot)
         outline += visible_pieces(xy, vis)
     if icon:
-        return svg([(outline, 3.2, 1)], 64, "Torus")
+        return svg([(outline, 4.6, 1)], 64, "Torus", pad=0.03)   # browser-tab icon
     return svg([(wire, 0.7, 0.7), (outline, 1.45, 1)], 120, "Torus")
 
 
