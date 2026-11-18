@@ -76,7 +76,7 @@ bing_site_verification = ""
 # personal data. Write the account name, the part before ".goatcounter.com" in the
 # address of your GoatCounter dashboard, then run python3 build.py and publish. ""
 # switches counting off. See README.md, "Visitor statistics".
-goatcounter = ""
+goatcounter = "ssouvikmandal"
 
 # The menu at the top of every page, in this order. Each entry is a page in
 # source/pages/ that is published under the same file name.
