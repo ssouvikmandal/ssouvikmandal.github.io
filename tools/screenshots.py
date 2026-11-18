@@ -10,7 +10,8 @@ Needs Playwright (on the author's server: ~/venvs/web/bin/python tools/screensho
 Without --url, the site is served from this folder at http://127.0.0.1:8765/ for the
 duration of the run. Either way the browser is not allowed to contact any other server than
 the site's own. Requests to the visitor counter (GoatCounter, if set in site.toml) are
-stopped too, so that these checks are never counted, and reported as "counter" lines.
+answered by this tool instead of being sent, so that these checks are never counted; they
+are listed as "counter" lines.
 """
 import argparse
 import functools
@@ -89,8 +90,8 @@ def main():
                     if r.request.url.startswith(base):
                         r.continue_()
                     elif counter and r.request.url.startswith(counter):
-                        counted.append(r.request.url)       # stopped: checks are not counted
-                        r.abort()
+                        counted.append(r.request.url)       # answered here, never sent:
+                        r.fulfill(status=204, body="")      # checks are not counted
                     else:
                         outside.append(r.request.url)
                         r.abort()
