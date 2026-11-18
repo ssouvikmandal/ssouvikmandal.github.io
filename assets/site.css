@@ -1,0 +1,364 @@
+/* Stylesheet for the whole site. Colours and sizes are set once, in :root below. */
+
+/* Fonts: New Computer Modern (the modern form of LaTeX's Computer Modern), subset for the
+   web; see fonts/README.txt. The "Math" file only supplies symbols such as ℝ. */
+@font-face {
+  font-family: "NewCM Web";
+  src: url("fonts/newcm-web-book.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "NewCM Web";
+  src: url("fonts/newcm-web-bookitalic.woff2") format("woff2");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "NewCM Web";
+  src: url("fonts/newcm-web-bold.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "NewCM Web";
+  src: url("fonts/newcm-web-bolditalic.woff2") format("woff2");
+  font-weight: 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "NewCM Web Math";
+  src: url("fonts/newcm-web-math.woff2") format("woff2");
+  font-weight: 400 700; font-style: normal; font-display: swap;
+  unicode-range: U+2102, U+2115, U+2119, U+211A, U+211D, U+2124, U+2200-22FF, U+27E8-27E9;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #fcfbf8;          /* page background: a warm, very light paper tone */
+  --text: #1c1c1c;        /* body text */
+  --muted: #595d63;       /* affiliation line, dates, footer */
+  --accent: #2e4a68;      /* the one accent colour: links, menu, motif (muted slate blue) */
+  --accent-dark: #1d3149; /* links on hover */
+  --rule: #dedad1;        /* thin lines */
+  --serif: "NewCM Web", "NewCM Web Math", "Latin Modern Roman", "CMU Serif",
+           "Computer Modern Serif", Georgia, "Times New Roman", serif;
+  --measure: 40rem;       /* width of the text column */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+@media (min-width: 40em) {
+  body { font-size: 1.1875rem; }
+}
+
+/* Layout. Phones and tablets: one column (header, menu, text).
+   Computers (60em and wider): the menu stands in a column on the left, under the
+   motif, and the name and the text share a second column. */
+.page, .site-footer > p {
+  width: 100%;
+  max-width: calc(var(--measure) + 2.5rem);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.page { flex: 1 0 auto; align-content: start; }
+@media (min-width: 40em) {
+  .page, .site-footer > p { max-width: calc(var(--measure) + 4rem); padding: 0 2rem; }
+}
+@media (min-width: 60em) {
+  :root { --side: 14.5rem; --gap: 3.5rem; }
+  .page, .site-footer > p {
+    max-width: calc(var(--side) + var(--gap) + var(--measure) + 4rem);
+  }
+  .page {
+    display: grid;
+    grid-template-columns: var(--side) minmax(0, var(--measure));
+    grid-template-areas: "header header" "nav main";
+    column-gap: var(--gap);
+  }
+  .site-header { grid-area: header; }
+  .site-nav { grid-area: nav; }
+  main { grid-area: main; }
+  .site-footer > p { padding-left: calc(2rem + var(--side) + var(--gap)); }
+}
+
+/* Skip link: hidden until it receives keyboard focus. */
+.skip {
+  position: absolute;
+  left: 1rem; top: -4rem;
+  padding: .4rem .8rem;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  z-index: 10;
+}
+.skip:focus { top: 1rem; }
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: .18em;
+}
+a:hover { color: var(--accent-dark); text-decoration-color: currentColor; }
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Links to PDF files get a small "pdf" mark. */
+a[href$=".pdf"]::after {
+  content: "pdf";
+  display: inline-block;
+  margin-left: .3em;
+  font-variant-caps: all-small-caps;
+  letter-spacing: .05em;
+  color: var(--muted);
+}
+
+/* Header: motif, name and position */
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0 1.4rem;
+}
+.motif {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+@media (min-width: 40em) {
+  .site-header { gap: 1.4rem; padding: 3rem 0 1.75rem; }
+  .motif { width: 4.5rem; height: 4.5rem; }
+}
+@media (min-width: 60em) {
+  .site-header {
+    display: grid;
+    grid-template-columns: var(--side) minmax(0, 1fr);
+    column-gap: var(--gap);
+    padding: 3.5rem 0 2.5rem;
+  }
+  .motif { width: 5rem; height: 5rem; }
+}
+.brand-text { min-width: 0; }
+.name {
+  display: inline-block;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  letter-spacing: .01em;
+}
+.name:hover { color: var(--accent); }
+@media (min-width: 40em) {
+  .name { font-size: 2.25rem; }
+}
+.affiliation {
+  margin: .35rem 0 0;
+  color: var(--muted);
+  font-size: .95rem;
+  line-height: 1.4;
+}
+.affiliation span { display: inline-block; }
+
+/* Menu */
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: .55rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.35rem;
+}
+.site-nav a {
+  display: inline-block;
+  padding: .25rem 0;
+  color: var(--text);
+  text-decoration: none;
+  font-variant-caps: all-small-caps;
+  letter-spacing: .05em;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+.site-nav a:hover { color: var(--accent); }
+.site-nav a[aria-current="page"] {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .3em;
+}
+@media (min-width: 60em) {
+  .site-nav ul {
+    flex-direction: column;
+    padding: 0;
+    border: 0;
+    position: sticky;
+    top: 2rem;
+  }
+  .site-nav li { border-top: 1px solid var(--rule); }
+  .site-nav li:last-child { border-bottom: 1px solid var(--rule); }
+  .site-nav a { display: block; position: relative; padding: .5rem 0 .45rem; }
+  .site-nav a[aria-current="page"] { text-decoration: none; }
+  .site-nav a[aria-current="page"]::before {   /* a short dash in the margin */
+    content: "";
+    position: absolute;
+    left: -1.35rem;
+    top: 1.15em;
+    width: .8rem;
+    border-top: 1px solid currentColor;
+  }
+}
+
+/* Main text */
+main {
+  padding: 2rem 0 3.5rem;
+  min-width: 0;
+}
+@media (min-width: 40em) {
+  main { padding: 2.5rem 0 4.5rem; }
+}
+@media (min-width: 60em) {
+  main { padding-top: .1rem; }
+}
+main > * { max-width: var(--measure); }
+
+h1, h2, h3 {
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--text);
+}
+h1 {
+  font-size: 1.75rem;
+  margin: 0 0 1.25rem;
+  letter-spacing: .005em;
+}
+h2 {
+  font-size: 1.3rem;
+  margin: 2.5rem 0 .9rem;
+}
+h3 {
+  font-size: 1.1rem;
+  font-style: italic;
+  margin: 1.8rem 0 .6rem;
+}
+@media (min-width: 40em) {
+  h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+}
+
+p { margin: 0 0 1em; }
+main p, main li { hyphens: auto; -webkit-hyphens: auto; }
+
+strong, b { font-weight: 700; }
+.nowrap { white-space: nowrap; }
+em, i, cite { font-style: italic; }
+
+/* Lists of entries (education, teaching, conferences, and later papers or talks) */
+ul.entries, ol.entries {
+  margin: 0 0 1.5rem;
+  padding-left: 1.3rem;
+}
+.entries > li {
+  margin-bottom: .9rem;
+  padding-left: .15rem;
+}
+.entries > li::marker { color: var(--accent); }
+ul.entries > li { list-style-type: "–\2002"; }
+.entries .lead { font-variant-caps: small-caps; letter-spacing: .02em; }
+.entries .detail { display: block; margin-top: .2rem; }
+.entries .label { font-style: italic; }
+
+/* Home page: photo to the right of the introduction */
+.photo {
+  float: right;
+  width: 7rem;
+  height: auto;
+  margin: .3rem 0 1rem 1.25rem;
+  border: 1px solid var(--rule);
+}
+@media (min-width: 40em) {
+  .photo { width: 10.5rem; margin: .35rem 0 1.25rem 2rem; }
+}
+.profile-links {
+  clear: both;
+  padding-top: .75rem;
+  font-variant-caps: all-small-caps;
+  letter-spacing: .05em;
+  font-size: 1.05em;
+}
+.profile-links .dot, .contact .dot { color: var(--muted); padding: 0 .45em; }
+
+/* Contact page */
+address.postal {
+  font-style: normal;
+  margin: 0 0 1.5rem;
+}
+dl.contact {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .35rem 1rem;
+  margin: 0;
+}
+dl.contact dt { font-weight: 700; }
+dl.contact dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Ready for later sections: publications, talks, students, news.
+   See README.md for an example of each kind of entry. */
+main .title { font-style: italic; }
+main .meta { color: var(--muted); }
+main .links { white-space: nowrap; }
+main .links a + a { margin-left: .7em; }
+main .links a[href$=".pdf"]::after { content: none; }   /* "PDF", "Slides" say it already */
+ol.entries { list-style: decimal; }
+ol.entries > li::marker { font-variant-numeric: tabular-nums; color: var(--muted); }
+.dated { list-style: none; padding-left: 0; margin: 0 0 1.5rem; }
+.dated > li {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  margin-bottom: .7rem;
+}
+.dated .date { color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 39.99em) {
+  .dated > li { grid-template-columns: 1fr; gap: 0; }
+}
+
+/* Formulas: long displayed formulas scroll instead of overflowing on phones. */
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: .9rem;
+}
+.site-footer > p { padding-top: 1.25rem; padding-bottom: 2rem; margin-top: 0; margin-bottom: 0; }
+
+/* Printing: no menu, black text, full link addresses. */
+@media print {
+  :root { --bg: #fff; --text: #000; --muted: #333; --accent: #000; }
+  .site-nav, .skip, .motif { display: none; }
+  .page { display: block; }
+  .site-header { padding: 0 0 1rem; display: block; }
+  main { padding-top: 1rem; }
+  main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; }
+}

@@ -1,0 +1,15 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Editor and system files
+.DS_Store
+*~
+*.swp
+
+# Secrets: never commit passwords, tokens or private keys
+.env
+.env.*
+
+# >>> files larger than 70 MB: kept up to date by ~/.local/bin/work-backup, do not edit >>>
+# <<< files larger than 70 MB <<<

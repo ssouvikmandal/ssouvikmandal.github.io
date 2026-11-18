@@ -1,0 +1,398 @@
+#!/usr/bin/env python3
+"""Build the website: turn site.toml, source/template.html and source/pages/*.html into the
+published pages, sitemap.xml and robots.txt.
+
+    python3 build.py             build everything
+    python3 build.py --check     build, then check every link and image between the pages
+    python3 build.py --external  as --check, and also test the links to other websites
+
+Needs only Python 3.11 or later; nothing to install. See README.md for how to edit the site.
+
+How a page is made: each file in source/pages/ starts with a comment holding its title and
+description, followed by the page text in HTML. The text may contain these placeholders,
+which are filled in from site.toml:
+
+    {{name}} {{position}} {{department}} {{institution}} {{email}}
+    {{email_link}}     the email address as a mailto: link
+    {{address}}        the postal address, one line per entry of `address`
+    {{photo}}          the photo images/photo.jpg, with its size and alt text
+    {{orcid_link}}     link to the ORCID profile
+    {{scholar_link}}   link to the Google Scholar profile
+    {{profile_links}}  a line with links to the CV, ORCID and Google Scholar
+
+Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
+MathJax from assets/mathjax/.
+
+"Last updated" in the footer is the date on which a page's content last changed: the build
+keeps a fingerprint of every page in source/last-updated.json and only moves the date
+forward when the page really changes.
+"""
+import argparse
+import datetime
+import hashlib
+import html
+import json
+import re
+import struct
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from html.parser import HTMLParser
+from pathlib import Path
+
+if sys.version_info < (3, 11):
+    sys.exit("build.py needs Python 3.11 or later (for tomllib).")
+import tomllib
+
+ROOT = Path(__file__).resolve().parent
+SOURCE = ROOT / "source"
+PAGES = SOURCE / "pages"
+DATES = SOURCE / "last-updated.json"
+PHOTO = "images/photo.jpg"
+CV = "cv.pdf"
+OG_IMAGE = "images/og-image.png"
+MATH_PATTERN = re.compile(r"(?<!\\)\$|\\\(|\\\[")
+MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+          "September", "October", "November", "December"]
+
+
+def fail(message):
+    sys.exit(f"build.py: {message}")
+
+
+# --- reading the sources ----------------------------------------------------------------
+
+def load_config():
+    try:
+        with open(ROOT / "site.toml", "rb") as f:
+            cfg = tomllib.load(f)
+    except tomllib.TOMLDecodeError as e:
+        fail(f"site.toml has a syntax error: {e}")
+    for key in ("site", "person", "nav"):
+        if key not in cfg:
+            fail(f"site.toml has no [{key}] section")
+    for key in ("name", "position", "department", "institution", "email", "address"):
+        if key not in cfg["person"]:
+            fail(f"site.toml: [person] has no `{key}`")
+    cfg["site"]["url"] = cfg["site"]["url"].rstrip("/")
+    return cfg
+
+
+def read_page(path):
+    """Split a page source into its settings (the leading comment) and its HTML."""
+    text = path.read_text(encoding="utf-8")
+    m = re.match(r"\s*<!--(.*?)-->\s*", text, re.S)
+    if not m:
+        fail(f"{path.relative_to(ROOT)} must start with a <!-- ... --> block holding "
+             "its title and description")
+    meta = {}
+    for line in m.group(1).strip().splitlines():
+        if line.strip():
+            key, sep, value = line.partition(":")
+            if not sep:
+                fail(f"{path.relative_to(ROOT)}: line `{line.strip()}` should look like `key: value`")
+            meta[key.strip().lower()] = value.strip()
+    for key in ("title", "description"):
+        if key not in meta:
+            fail(f"{path.relative_to(ROOT)}: no `{key}:` line in the comment at the top")
+    return meta, text[m.end():].rstrip() + "\n"
+
+
+def image_size(path):
+    """Width and height of a JPEG or PNG file (whatever its extension says)."""
+    data = path.read_bytes()
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return struct.unpack(">II", data[16:24])
+    if data[:2] == b"\xff\xd8":
+        i = 2
+        while i < len(data):
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker = data[i + 1]
+            if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+                i += 2
+                continue
+            length = struct.unpack(">H", data[i + 2:i + 4])[0]
+            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                h, w = struct.unpack(">HH", data[i + 5:i + 9])
+                return w, h
+            i += 2 + length
+    fail(f"{path.relative_to(ROOT)} is not a JPEG or PNG image")
+
+
+# --- placeholders -----------------------------------------------------------------------
+
+def entities(text):
+    """Write every character as an HTML character reference (keeps the email address
+    readable for people but hides it from the simplest address-harvesting programs)."""
+    return "".join(f"&#{ord(c)};" for c in text)
+
+
+def placeholders(cfg):
+    p = cfg["person"]
+    esc = html.escape
+    values = {k: esc(str(p[k])) for k in ("name", "position", "department", "institution")}
+    values["email"] = entities(p["email"])
+    values["email_link"] = f'<a href="{entities("mailto:" + p["email"])}">{entities(p["email"])}</a>'
+    values["address"] = ('<address class="postal">\n'
+                         + "<br>\n".join(esc(line) for line in p["address"])
+                         + "\n</address>")
+    w, h = image_size(ROOT / PHOTO)
+    values["photo"] = (f'<img class="photo" src="{PHOTO}" width="{w}" height="{h}" '
+                       f'alt="Photo of {esc(p["name"])}">')
+    links = []
+    if p.get("orcid"):
+        orcid_id = p["orcid"].rstrip("/").rsplit("/", 1)[-1]
+        values["orcid_link"] = (f'<a href="{esc(p["orcid"])}" title="ORCID iD {esc(orcid_id)}">'
+                                "ORCID</a>")
+        links.append(values["orcid_link"])
+    else:
+        values["orcid_link"] = ""
+    if p.get("google_scholar"):
+        values["scholar_link"] = f'<a href="{esc(p["google_scholar"])}">Google Scholar</a>'
+        links.append(values["scholar_link"])
+    else:
+        values["scholar_link"] = ""
+    if (ROOT / CV).exists():
+        links.insert(0, f'<a href="{CV}">CV</a>')
+    values["profile_links"] = ('<p class="profile-links">'
+                               + '<span class="dot" aria-hidden="true">·</span>'.join(links)
+                               + "</p>")
+    return values
+
+
+def attr(text):
+    """Escape plain text for use in HTML (also inside double-quoted attributes)."""
+    return html.escape(text, quote=False).replace('"', "&quot;")
+
+
+def fill(text, values, where, strict=True):
+    """Replace {{key}} by values[key]. In page text an unknown {{key}} (which could be part
+    of a formula) is left alone; in the template it is an error."""
+    def sub(m):
+        key = m.group(1)
+        if key not in values:
+            if strict:
+                fail(f"{where}: unknown placeholder {{{{{key}}}}}")
+            print(f"note: {where}: {{{{{key}}}}} is not a placeholder; left as it is")
+            return m.group(0)
+        return values[key]
+    return re.sub(r"\{\{\s*([a-z_]+)\s*\}\}", sub, text)
+
+
+# --- building ---------------------------------------------------------------------------
+
+def page_url(cfg, file):
+    base = cfg["site"]["url"]
+    return base + "/" if file == "index.html" else f"{base}/{file}"
+
+
+def nav_html(cfg, current):
+    lines = []
+    for item in cfg["nav"]:
+        here = ' aria-current="page"' if item["file"] == current else ""
+        lines.append(f'      <li><a href="{item["file"]}"{here}>{html.escape(item["label"])}</a></li>')
+    return "\n".join(lines)
+
+
+def person_jsonld(cfg):
+    p, site = cfg["person"], cfg["site"]
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": p["name"],
+        "url": site["url"] + "/",
+        "image": f'{site["url"]}/{PHOTO}',
+        "jobTitle": p["position"],
+        "affiliation": {"@type": "Organization", "name": p["institution"],
+                        "department": {"@type": "Organization", "name": p["department"]}},
+        "sameAs": [u for u in (p.get("orcid"), p.get("google_scholar")) if u],
+    }
+    if p.get("orcid"):
+        data["identifier"] = {"@type": "PropertyValue", "propertyID": "ORCID",
+                              "value": p["orcid"].rstrip("/").rsplit("/", 1)[-1]}
+    if p.get("research_areas"):
+        data["knowsAbout"] = p["research_areas"]
+    text = json.dumps(data, ensure_ascii=False, indent=2).replace("</", "<\\/")
+    return f'<script type="application/ld+json">\n{text}\n</script>\n'
+
+
+def render(cfg, template, values, file, meta, body, updated):
+    site, person = cfg["site"], cfg["person"]
+    is_home, is_404 = file == "index.html", file == "404.html"
+    where = f"source/pages/{file}"
+    # Title and description are plain text: fill in the plain values, then escape.
+    plain = {k: str(person[k]) for k in ("name", "position", "department", "institution")}
+    title = fill(meta["title"], plain, where)
+    if not is_home and person["name"] not in title:
+        title = f'{title} – {person["name"]}'
+    description = fill(meta["description"], plain, where)
+    head_extra = ""
+    if meta.get("math", "auto") == "yes" or (meta.get("math", "auto") == "auto"
+                                             and MATH_PATTERN.search(body)):
+        head_extra += ('<script src="assets/mathjax-config.js"></script>\n'
+                       '<script defer src="assets/mathjax/tex-chtml.js"></script>\n')
+    if is_home:
+        head_extra += person_jsonld(cfg)
+    base_path = urllib.parse.urlsplit(site["url"]).path.rstrip("/") + "/"
+    page_values = dict(values)
+    page_values.update({
+        "language": html.escape(site.get("language", "en")),
+        "title": attr(title),
+        "description": attr(description),
+        "canonical": page_url(cfg, file),
+        "og_type": "profile" if is_home else "website",
+        "og_image": f'{site["url"]}/{OG_IMAGE}',
+        "nav": nav_html(cfg, file),
+        "content": fill(body, values, where, strict=False).rstrip(),
+        "head_extra": head_extra,
+        # The 404 page is shown at any address, so its links must start from the site root.
+        "base": f'<base href="{html.escape(base_path)}">\n' if is_404 else "",
+        "robots": '<meta name="robots" content="noindex">\n' if is_404 else "",
+        "updated": f"{updated.day} {MONTHS[updated.month - 1]} {updated.year}",
+        "updated_iso": updated.isoformat(),
+    })
+    return fill(template, page_values, "source/template.html")
+
+
+def build(today):
+    cfg = load_config()
+    template = (SOURCE / "template.html").read_text(encoding="utf-8")
+    values = placeholders(cfg)
+    dates = json.loads(DATES.read_text()) if DATES.exists() else {}
+    nav_files = [item["file"] for item in cfg["nav"]]
+    if len(set(nav_files)) != len(nav_files):
+        fail("site.toml: the same file appears twice in [[nav]]")
+    files = nav_files + ["404.html"]
+    for f in sorted(p.name for p in PAGES.glob("*.html")):
+        if f not in files:
+            print(f"note: source/pages/{f} is not in the menu (add it to [[nav]] in site.toml "
+                  "to publish it)")
+    for file in files:
+        src = PAGES / file
+        if not src.exists():
+            fail(f"site.toml lists {file} in the menu, but source/pages/{file} does not exist")
+    new_dates, written = {}, []
+    for file in files:
+        meta, body = read_page(PAGES / file)
+        # Fingerprint the page without its date, to tell whether it changed.
+        probe = render(cfg, template, values, file, meta, body, datetime.date(2000, 1, 1))
+        digest = hashlib.sha256(probe.encode()).hexdigest()
+        old = dates.get(file, {})
+        updated = (datetime.date.fromisoformat(old["date"])
+                   if old.get("hash") == digest else today)
+        new_dates[file] = {"date": updated.isoformat(), "hash": digest}
+        out = render(cfg, template, values, file, meta, body, updated)
+        target = ROOT / file
+        if not target.exists() or target.read_text(encoding="utf-8") != out:
+            target.write_text(out, encoding="utf-8")
+            written.append(file)
+    DATES.write_text(json.dumps(new_dates, indent=2, sort_keys=True) + "\n")
+    # sitemap.xml and robots.txt
+    entries = "".join(f"  <url>\n    <loc>{html.escape(page_url(cfg, f))}</loc>\n"
+                      f"    <lastmod>{new_dates[f]['date']}</lastmod>\n  </url>\n"
+                      for f in nav_files)
+    extra = [(ROOT / "sitemap.xml",
+              '<?xml version="1.0" encoding="UTF-8"?>\n'
+              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+              + entries + "</urlset>\n"),
+             (ROOT / "robots.txt",
+              "User-agent: *\nAllow: /\nDisallow: /source/\nDisallow: /tools/\n\n"
+              f"Sitemap: {cfg['site']['url']}/sitemap.xml\n"),
+             (ROOT / ".nojekyll", "")]
+    for path, text in extra:
+        if not path.exists() or path.read_text(encoding="utf-8") != text:
+            path.write_text(text, encoding="utf-8")
+            written.append(path.name)
+    print("written: " + (", ".join(written) if written else "nothing (everything was up to date)"))
+    return cfg, files
+
+
+# --- checking ---------------------------------------------------------------------------
+
+class Links(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links, self.ids, self.base = [], set(), None
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if "id" in a:
+            self.ids.add(a["id"])
+        if tag == "base":
+            self.base = a.get("href")
+        for key in ("href", "src"):
+            if a.get(key) and not (tag == "link" and a.get("rel") in ("canonical",)) \
+                    and not (tag == "base"):
+                self.links.append(html.unescape(a[key]))
+
+
+def check(cfg, files, external):
+    problems, outside = [], set()
+    pages = {}
+    for file in files:
+        parser = Links()
+        parser.feed((ROOT / file).read_text(encoding="utf-8"))
+        pages[file] = parser
+    for file, parser in pages.items():
+        for link in parser.links:
+            parts = urllib.parse.urlsplit(link)
+            if parts.scheme in ("http", "https"):
+                outside.add(link)
+                continue
+            if parts.scheme in ("mailto", "tel") or link.startswith("data:"):
+                continue
+            if link.startswith("/") and file != "404.html":
+                problems.append(f"{file}: {link} starts with / (use a relative link)")
+                continue
+            path = parts.path.lstrip("/") or file
+            target = (ROOT / path) if file == "404.html" else (ROOT / file).parent / path
+            if not target.exists():
+                problems.append(f"{file}: link to {link}, but {path} does not exist")
+            elif parts.fragment and path in pages and parts.fragment not in pages[path].ids:
+                problems.append(f"{file}: link to {link}, but {path} has no id {parts.fragment!r}")
+    for f in ("favicon.ico", "images/favicon.svg", "images/motif.svg", OG_IMAGE, PHOTO):
+        if not (ROOT / f).exists():
+            problems.append(f"missing file: {f}")
+    if external:
+        for url in sorted(outside):
+            status = fetch_status(url)
+            ok = isinstance(status, int) and status < 400
+            print(f"  {'ok  ' if ok else 'FAIL'} {status}  {url}")
+            if not ok:
+                problems.append(f"outside link may be broken ({status}): {url}")
+    print(f"checked {len(files)} pages: " + ("no problems" if not problems else
+                                             f"{len(problems)} problem(s)"))
+    for p in problems:
+        print("  - " + p)
+    return not problems
+
+
+def fetch_status(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (link check)"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        return e.code
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        return f"error: {getattr(e, 'reason', e)}"
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Build the website (see README.md).")
+    ap.add_argument("--check", action="store_true", help="check links and images after building")
+    ap.add_argument("--external", action="store_true", help="also test links to other websites")
+    ap.add_argument("--date", help="use this date (YYYY-MM-DD) instead of today for changed pages")
+    args = ap.parse_args()
+    today = datetime.date.fromisoformat(args.date) if args.date else datetime.date.today()
+    cfg, files = build(today)
+    if args.check or args.external:
+        if not check(cfg, files, args.external):
+            sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

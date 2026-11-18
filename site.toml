@@ -1,0 +1,62 @@
+# Everything that changes with a new job lives in this file. After editing it, run
+#     python3 build.py
+# to regenerate every page (see README.md).
+
+[site]
+# Full address of the published site, without a trailing slash. Only sitemap.xml,
+# robots.txt, the 404 page and the link-preview tags use it; the pages link to each
+# other with relative links, so they work anywhere. Change it when the site moves.
+url = "https://ssouvikmandal.github.io"
+language = "en"
+
+[person]
+name = "Souvik Mandal"
+# Shown under your name at the top of every page and used in the page descriptions.
+position = "Research Scholar"
+department = "Department of Mathematics"
+institution = "IIT Madras"
+email = "ma22d014@smail.iitm.ac.in"
+orcid = "https://orcid.org/0009-0004-0429-3063"
+google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
+# Research areas, for search engines (schema.org "knowsAbout"); not shown on the pages.
+research_areas = ["Topology", "Geometry"]
+# Postal address, one line per entry, as shown on the Contact page.
+address = [
+  "Souvik Mandal",
+  "Research Scholar, Deparment of Mathematics, IIT Madras",
+  "NAC-620, IIT Madras",
+  "Chennai -600036",
+  "India",
+]
+# The photo is always images/photo.jpg and the CV is always cv.pdf: to update them,
+# replace those files (keep the names) and run python3 build.py.
+
+# The menu at the top of every page, in this order. Each entry is a page in
+# source/pages/ that is published under the same file name.
+[[nav]]
+label = "Home"
+file = "index.html"
+
+[[nav]]
+label = "Academic Details & CV"
+file = "cv.html"
+
+[[nav]]
+label = "Research"
+file = "research.html"
+
+[[nav]]
+label = "Achievements"
+file = "achievements.html"
+
+[[nav]]
+label = "Teaching"
+file = "teaching.html"
+
+[[nav]]
+label = "Conference & Workshop"
+file = "conferences.html"
+
+[[nav]]
+label = "Contact"
+file = "contact.html"

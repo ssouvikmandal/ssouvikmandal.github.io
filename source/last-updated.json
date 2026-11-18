@@ -1,0 +1,34 @@
+{
+  "404.html": {
+    "date": "2026-11-18",
+    "hash": "a529c19b9699486d6e2f4c1c8c95b320c91ce6d90e7df2de3691b15040e5272d"
+  },
+  "achievements.html": {
+    "date": "2026-11-18",
+    "hash": "d5aaeb8ea29cb8d7895454c44398c1b14c895238c1453af28bd41cfe33e24a18"
+  },
+  "conferences.html": {
+    "date": "2026-11-18",
+    "hash": "8fc1c1103e23cb5f2f7b687bf09c4fb760ee1e0044855a172434247969c7299a"
+  },
+  "contact.html": {
+    "date": "2026-11-18",
+    "hash": "10e371421194046f8248cd3a9c94f5b9240b60a6cc5e4967300a5ea8ce1fa13c"
+  },
+  "cv.html": {
+    "date": "2026-11-18",
+    "hash": "5e96007324bcdc0e46fab58c1d0b7a694cd1a541b5cc7999c6f4cfda7a7a0750"
+  },
+  "index.html": {
+    "date": "2026-11-18",
+    "hash": "d916f437c7711507d2de988fc06dbded654acfd6d1ebe793834dddb179cdd8bb"
+  },
+  "research.html": {
+    "date": "2026-11-18",
+    "hash": "072c4564514e51537b458916cde2f91a791f6f52750aa81833ae728b6747c435"
+  },
+  "teaching.html": {
+    "date": "2026-11-18",
+    "hash": "8cac2dd6728454fd5e827fc754673d017391aa3ef174c11c1b5940dbc7ce72b2"
+  }
+}

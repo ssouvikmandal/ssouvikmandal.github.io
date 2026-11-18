@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /source/
+Disallow: /tools/
+
+Sitemap: https://ssouvikmandal.github.io/sitemap.xml
