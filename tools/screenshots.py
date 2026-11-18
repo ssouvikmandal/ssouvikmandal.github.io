@@ -4,10 +4,12 @@ report problems: requests to outside servers, missing files, script errors, imag
 not load, images without alt text, and pages wider than the screen.
 
     python tools/screenshots.py OUTPUT_FOLDER
+    python tools/screenshots.py OUTPUT_FOLDER --url https://ssouvikmandal.github.io   (live site)
 
 Needs Playwright (on the author's server: ~/venvs/web/bin/python tools/screenshots.py ...).
-The site is served from this folder at http://127.0.0.1:8765/ for the duration of the run;
-the browser is not allowed to contact any other server.
+Without --url, the site is served from this folder at http://127.0.0.1:8765/ for the
+duration of the run. Either way the browser is not allowed to contact any other server than
+the site's own.
 """
 import argparse
 import functools
@@ -38,6 +40,7 @@ def main():
     ap.add_argument("--sizes", nargs="*", default=list(SIZES), choices=list(SIZES))
     ap.add_argument("--viewport-only", action="store_true", help="screenshot the first screen only")
     ap.add_argument("--scale", type=float, default=1, help="pixel density of the computer screenshots (phone: 2)")
+    ap.add_argument("--url", help="check this published site instead of the local files")
     args = ap.parse_args()
     from playwright.sync_api import sync_playwright
 
@@ -58,9 +61,13 @@ def main():
             else:
                 super().send_error(code, message, explain)
 
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT),
-                                             functools.partial(NotFound, directory=str(ROOT)))
-    threading.Thread(target=server.serve_forever, daemon=True).start()
+    if args.url:
+        base, server = args.url.rstrip("/") + "/", None
+    else:
+        base = f"http://127.0.0.1:{PORT}/"
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT),
+                                                 functools.partial(NotFound, directory=str(ROOT)))
+        threading.Thread(target=server.serve_forever, daemon=True).start()
     problems = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -74,7 +81,7 @@ def main():
                 outside, failed, errors = [], [], []
 
                 def route(r):
-                    if r.request.url.startswith(f"http://127.0.0.1:{PORT}/"):
+                    if r.request.url.startswith(base):
                         r.continue_()
                     else:
                         outside.append(r.request.url)
@@ -85,7 +92,7 @@ def main():
                 page.on("pageerror", lambda e: errors.append(str(e)))
                 page.on("console", lambda m: errors.append(m.text) if m.type == "error"
                         and "404" not in m.text else None)
-                page.goto(f"http://127.0.0.1:{PORT}/{page_name}", wait_until="networkidle")
+                page.goto(base + page_name, wait_until="networkidle")
                 page.evaluate("document.fonts.ready")
                 page.wait_for_timeout(300)
                 info = page.evaluate("""() => ({
@@ -118,7 +125,8 @@ def main():
                 page.close()
             ctx.close()
         browser.close()
-    server.shutdown()
+    if server:
+        server.shutdown()
     print("no problems" if not problems else f"{len(problems)} problem(s):")
     for p in problems:
         print("  - " + p)
