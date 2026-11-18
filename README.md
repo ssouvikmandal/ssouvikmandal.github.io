@@ -288,7 +288,10 @@ headers, so nothing here needs editing by hand:
   institution and department with their web addresses, places studied (`studied_at`),
   awards (`awards`), research areas (`research_areas`), ORCID iD, and the ORCID and Google
   Scholar profiles as the same person (`sameAs`). All of it comes from `site.toml`; keep it
-  in line with the pages. The ORCID and Google Scholar icons also carry `rel="me"`.
+  in line with the pages. The ORCID and Google Scholar icons also carry `rel="me"`. The
+  profile also says when the site was first published (`created` in `site.toml`) and when
+  the home page last changed (kept in `source/last-updated.json`), both as date, time and
+  time zone, e.g. `2026-11-18T10:31:41+00:00`: Google marks plain dates there as invalid.
 - **Other tags:** a canonical address on every page (the home page is
   `https://ssouvikmandal.github.io/`, not `.../index.html`), `max-image-preview:large` (so
   results may show the photo in full size), link-preview tags, `noindex` on the 404 page,

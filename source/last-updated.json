@@ -1,38 +1,47 @@
 {
   "404.html": {
     "date": "2026-11-18",
-    "hash": "5f65194113a4f7962675f3053e11aa9aaabe1004ca13cc752f6fa1566bc919cc"
+    "hash": "5f65194113a4f7962675f3053e11aa9aaabe1004ca13cc752f6fa1566bc919cc",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "achievements.html": {
     "date": "2026-11-18",
-    "hash": "1be3b482cdd82eef6bd6aeda6e3c01c46d4c793a1eca85930f4cfab3aef527f2"
+    "hash": "1be3b482cdd82eef6bd6aeda6e3c01c46d4c793a1eca85930f4cfab3aef527f2",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "conferences.html": {
     "date": "2026-11-18",
-    "hash": "daf18a6513abd6a02f5ae00071f622186052dd3758ddd79d9feb267569ef31f2"
+    "hash": "daf18a6513abd6a02f5ae00071f622186052dd3758ddd79d9feb267569ef31f2",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "contact.html": {
     "date": "2026-11-18",
-    "hash": "dca9e46141101c6434acadc0b4579019db151082a368ad851057f3d9ef01baad"
+    "hash": "dca9e46141101c6434acadc0b4579019db151082a368ad851057f3d9ef01baad",
+    "time": "2026-11-18T15:40:03+00:00"
   },
   "cv.html": {
     "date": "2026-11-18",
-    "hash": "10615549928a06de39beee3288aa99ae490cdb5d09fc842ef0898e723ba5a808"
+    "hash": "10615549928a06de39beee3288aa99ae490cdb5d09fc842ef0898e723ba5a808",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "index.html": {
     "date": "2026-11-18",
-    "hash": "ad36ed4449f1c3d277abdb43032f4ba3d8174fd8159ce5c275565655a32f23b0"
+    "hash": "0d31808fbe425a72cefddf4880b97a4568fdf03d9b7040ee865345f11348e633",
+    "time": "2026-11-18T18:47:10+00:00"
   },
   "publications.html": {
     "date": "2026-11-18",
-    "hash": "c776901739d21991929238dab00a4d1ee32031e501833de980b10db2f979e5c1"
+    "hash": "c776901739d21991929238dab00a4d1ee32031e501833de980b10db2f979e5c1",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "research.html": {
     "date": "2026-11-18",
-    "hash": "d865f8e852cfdbae0fc1abb6ba8c816fa2c51ed9e3be938cdb462e3224c65d7b"
+    "hash": "d865f8e852cfdbae0fc1abb6ba8c816fa2c51ed9e3be938cdb462e3224c65d7b",
+    "time": "2026-11-18T15:35:57+00:00"
   },
   "teaching.html": {
     "date": "2026-11-18",
-    "hash": "6b16852e3ae804e53b695d4cd476a33b2b67bfaac7b5b76472635a20cfe1d82e"
+    "hash": "6b16852e3ae804e53b695d4cd476a33b2b67bfaac7b5b76472635a20cfe1d82e",
+    "time": "2026-11-18T15:35:57+00:00"
   }
 }

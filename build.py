@@ -44,7 +44,8 @@ the year of the page's last update) and "Last updated <date>" on the right.
 
 "Last updated" in the footer is the date on which a page's content last changed: the build
 keeps a fingerprint of every page in source/last-updated.json and only moves the date
-forward when the page really changes.
+forward when the page really changes. The file also keeps the time of that change, which
+the home page gives search engines as dateModified.
 """
 import argparse
 import datetime
@@ -270,13 +271,27 @@ def nav_html(cfg, current):
     return "\n".join(lines)
 
 
+def date_time(value):
+    """An ISO 8601 date and time with its time zone, e.g. "2026-11-18T10:31:41+00:00", as
+    Google requires for schema.org dates. Takes a datetime (one without a time zone is taken
+    as local time), a date (midnight, local time) or such a value written as text."""
+    if isinstance(value, str):
+        value = (datetime.datetime.fromisoformat(value) if "T" in value
+                 else datetime.date.fromisoformat(value))
+    if not isinstance(value, datetime.datetime):
+        value = datetime.datetime.combine(value, datetime.time())
+    if value.tzinfo is None:
+        value = value.astimezone()
+    return value.replace(microsecond=0).isoformat()
+
+
 def name_parts(name):
     """("Souvik", "Mandal") from "Souvik Mandal": given names, then the family name."""
     parts = name.split()
     return (" ".join(parts[:-1]), parts[-1]) if len(parts) > 1 else ("", name)
 
 
-def home_jsonld(cfg, title, description, updated):
+def home_jsonld(cfg, title, description, modified):
     """The description of the site and of its owner that search engines read from the home
     page (schema.org, in JSON-LD): a WebSite (which gives Google the site's name) and a
     ProfilePage whose main subject is the Person. Everything comes from site.toml."""
@@ -329,12 +344,15 @@ def home_jsonld(cfg, title, description, updated):
             {"@type": "WebSite", "@id": home + "#website", "url": home, "name": p["name"],
              "inLanguage": site.get("language", "en"), "publisher": {"@id": home + "#person"}},
             {"@type": "ProfilePage", "@id": home, "url": home, "name": title,
-             "inLanguage": site.get("language", "en"), "isPartOf": {"@id": home + "#website"},
-             "dateModified": updated.isoformat(), "mainEntity": person},
+             "inLanguage": site.get("language", "en"), "isPartOf": {"@id": home + "#website"}},
         ],
     }
+    profile = data["@graph"][1]
+    # Dates with time and time zone (Google flags plain dates on a ProfilePage as invalid).
     if site.get("created"):
-        data["@graph"][1]["dateCreated"] = str(site["created"])
+        profile["dateCreated"] = date_time(site["created"])
+    profile["dateModified"] = modified
+    profile["mainEntity"] = person
     text = json.dumps(data, ensure_ascii=False, indent=2).replace("</", "<\\/")
     return f'<script type="application/ld+json">\n{text}\n</script>\n'
 
@@ -359,7 +377,9 @@ def home_meta(cfg):
     return tags
 
 
-def render(cfg, template, values, file, meta, body, updated):
+def render(cfg, template, values, file, meta, body, updated, modified):
+    """`updated`: the date of the page's last change (footer); `modified`: the same moment
+    as date and time with time zone (for search engines)."""
     site, person = cfg["site"], cfg["person"]
     is_home, is_404 = file == "index.html", file == "404.html"
     where = f"source/pages/{file}"
@@ -377,7 +397,7 @@ def render(cfg, template, values, file, meta, body, updated):
         head_extra += ('<script src="assets/mathjax-config.js"></script>\n'
                        '<script defer src="assets/mathjax/tex-chtml.js"></script>\n')
     if is_home:
-        head_extra += home_meta(cfg) + home_jsonld(cfg, title, description, updated)
+        head_extra += home_meta(cfg) + home_jsonld(cfg, title, description, modified)
     base_path = urllib.parse.urlsplit(site["url"]).path.rstrip("/") + "/"
     since = int(site.get("since", updated.year))
     page_values = dict(values)
@@ -408,7 +428,9 @@ def render(cfg, template, values, file, meta, body, updated):
     return fill(template, page_values, "source/template.html")
 
 
-def build(today):
+def build(now):
+    """`now`: the date and time (with time zone) recorded for pages that changed."""
+    today = now.date()
     cfg = load_config()
     template = (SOURCE / "template.html").read_text(encoding="utf-8")
     values = placeholders(cfg)
@@ -429,13 +451,17 @@ def build(today):
     for file in files:
         meta, body = read_page(PAGES / file)
         # Fingerprint the page without its date, to tell whether it changed.
-        probe = render(cfg, template, values, file, meta, body, datetime.date(2000, 1, 1))
+        probe = render(cfg, template, values, file, meta, body, datetime.date(2000, 1, 1),
+                       "2000-01-01T00:00:00+00:00")
         digest = hashlib.sha256(probe.encode()).hexdigest()
         old = dates.get(file, {})
-        updated = (datetime.date.fromisoformat(old["date"])
-                   if old.get("hash") == digest else today)
-        new_dates[file] = {"date": updated.isoformat(), "hash": digest}
-        out = render(cfg, template, values, file, meta, body, updated)
+        if old.get("hash") == digest:
+            updated = datetime.date.fromisoformat(old["date"])
+            modified = old.get("time") or date_time(updated)
+        else:
+            updated, modified = today, date_time(now)
+        new_dates[file] = {"date": updated.isoformat(), "time": modified, "hash": digest}
+        out = render(cfg, template, values, file, meta, body, updated, modified)
         target = ROOT / file
         if not target.exists() or target.read_text(encoding="utf-8") != out:
             target.write_text(out, encoding="utf-8")
@@ -543,10 +569,12 @@ def main():
     ap = argparse.ArgumentParser(description="Build the website (see README.md).")
     ap.add_argument("--check", action="store_true", help="check links and images after building")
     ap.add_argument("--external", action="store_true", help="also test links to other websites")
-    ap.add_argument("--date", help="use this date (YYYY-MM-DD) instead of today for changed pages")
+    ap.add_argument("--date", help="use this date (YYYY-MM-DD, at midnight) instead of now "
+                                   "for changed pages")
     args = ap.parse_args()
-    today = datetime.date.fromisoformat(args.date) if args.date else datetime.date.today()
-    cfg, files = build(today)
+    now = (datetime.datetime.combine(datetime.date.fromisoformat(args.date), datetime.time())
+           if args.date else datetime.datetime.now()).astimezone().replace(microsecond=0)
+    cfg, files = build(now)
     if args.check or args.external:
         if not check(cfg, files, args.external):
             sys.exit(1)

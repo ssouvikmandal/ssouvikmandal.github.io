@@ -11,8 +11,9 @@ url = "https://ssouvikmandal.github.io"
 # The year the site started: the footer shows "© 2026 Souvik Mandal", or "© 2026–2028"
 # once a page has been updated in a later year.
 since = 2026
-# The day the site was first published (for search engines: schema.org "dateCreated").
-created = 2026-11-18
+# When the site was first published, as date, time and time zone ("Z" = UTC); for search
+# engines (schema.org "dateCreated"). A plain date such as 2026-11-18 also works.
+created = 2026-11-18T10:31:41Z
 language = "en"
 
 [person]
