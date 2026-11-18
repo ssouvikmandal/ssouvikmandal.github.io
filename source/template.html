@@ -44,7 +44,10 @@
   </main>
 </div>
 <footer class="site-footer">
-  <p>{{name}} · Last updated <time datetime="{{updated_iso}}">{{updated}}</time></p>
+  <div class="footer-inner">
+    <p class="copyright">© {{copyright_years}} {{name}}</p>
+    <p class="updated">Last updated <time datetime="{{updated_iso}}">{{updated}}</time></p>
+  </div>
 </footer>
 </body>
 </html>

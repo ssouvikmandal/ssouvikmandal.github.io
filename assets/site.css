@@ -72,7 +72,7 @@ body {
 /* Layout. Phones and tablets: one column (header, menu, text).
    Computers (60em and wider): the menu stands in a column on the left, under the
    ORCID and email icons, and the name and the text share a second column. */
-.page, .site-footer > p {
+.page, .footer-inner {
   width: 100%;
   max-width: calc(var(--measure) + 2.5rem);
   margin: 0 auto;
@@ -80,11 +80,11 @@ body {
 }
 .page { flex: 1 0 auto; align-content: start; }
 @media (min-width: 40em) {
-  .page, .site-footer > p { max-width: calc(var(--measure) + 4rem); padding: 0 2rem; }
+  .page, .footer-inner { max-width: calc(var(--measure) + 4rem); padding: 0 2rem; }
 }
 @media (min-width: 60em) {
   :root { --side: 15.5rem; --gap: 3.5rem; }
-  .page, .site-footer > p {
+  .page, .footer-inner {
     max-width: calc(var(--side) + var(--gap) + var(--measure) + 4rem);
   }
   .page {
@@ -96,7 +96,6 @@ body {
   .site-header { grid-area: header; }
   .site-nav { grid-area: nav; }
   main { grid-area: main; }
-  .site-footer > p { padding-left: calc(2rem + var(--side) + var(--gap)); }
 }
 
 /* Faint drawings from topology in the empty parts of the page (computers only): a torus
@@ -120,7 +119,7 @@ body {
     width: calc(50% - 11.5rem);        /* the text column starts at 50% - 10.5rem */
     background-image: url("../images/bg-torus.svg"), url("../images/bg-knot.svg");
     background-size: 30rem auto, 15rem auto;
-    background-position: right 0 top 10rem, left 2rem top 38rem;
+    background-position: right 0 top 10rem, left 2rem top 36rem;
   }
 }
 @media (min-width: 80em) {
@@ -507,11 +506,29 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width:
 
 /* Footer */
 .site-footer {
+  background: var(--bg);   /* covers the faint drawings: the footer text stays on plain paper */
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: .9rem;
 }
-.site-footer > p { padding-top: 1.25rem; padding-bottom: 2rem; margin-top: 0; margin-bottom: 0; }
+.footer-inner { padding-top: 1.25rem; padding-bottom: 2rem; }
+.footer-inner p { margin: 0; }
+.footer-inner .updated { margin-top: .2rem; }
+@media (min-width: 40em) {
+  /* Tablets: the two parts at the two ends of one line. */
+  .footer-inner { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .footer-inner .updated { margin-top: 0; }
+}
+@media (min-width: 60em) {
+  /* Computers: the copyright under the menu column, the date at the right edge of the
+     text column. */
+  .footer-inner {
+    display: grid;
+    grid-template-columns: var(--side) minmax(0, var(--measure));
+    column-gap: var(--gap);
+  }
+  .footer-inner .updated { justify-self: end; }
+}
 
 /* Printing: no menu, black text, full link addresses. */
 @media print {

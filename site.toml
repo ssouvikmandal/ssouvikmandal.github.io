@@ -7,6 +7,9 @@
 # robots.txt, the 404 page and the link-preview tags use it; the pages link to each
 # other with relative links, so they work anywhere. Change it when the site moves.
 url = "https://ssouvikmandal.github.io"
+# The year the site started: the footer shows "© 2026 Souvik Mandal", or "© 2026–2028"
+# once a page has been updated in a later year.
+since = 2026
 language = "en"
 
 [person]

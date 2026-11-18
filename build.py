@@ -34,6 +34,9 @@ to the Contact page, where the address can be read and copied. On phones and tab
 links are mailto: links (they open the email app); on computers they open Gmail's "new
 message" window in a new browser tab.
 
+The footer shows "© <years> <name>" on the left (the years run from `since` in site.toml to
+the year of the page's last update) and "Last updated <date>" on the right.
+
 "Last updated" in the footer is the date on which a page's content last changed: the build
 keeps a fingerprint of every page in source/last-updated.json and only moves the date
 forward when the page really changes.
@@ -301,6 +304,7 @@ def render(cfg, template, values, file, meta, body, updated):
     if is_home:
         head_extra += person_jsonld(cfg)
     base_path = urllib.parse.urlsplit(site["url"]).path.rstrip("/") + "/"
+    since = int(site.get("since", updated.year))
     page_values = dict(values)
     page_values.update({
         "language": html.escape(site.get("language", "en")),
@@ -316,6 +320,8 @@ def render(cfg, template, values, file, meta, body, updated):
         "base": f'<base href="{html.escape(base_path)}">\n' if is_404 else "",
         "robots": '<meta name="robots" content="noindex">\n' if is_404 else "",
         "updated": f"{updated.day} {MONTHS[updated.month - 1]} {updated.year}",
+        # "2026", or "2026–2028" for a page last updated in a later year
+        "copyright_years": (str(since) if updated.year <= since else f"{since}–{updated.year}"),
         "updated_iso": updated.isoformat(),
     })
     return fill(template, page_values, "source/template.html")
