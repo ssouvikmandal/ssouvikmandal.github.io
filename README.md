@@ -125,13 +125,13 @@ sessions, July–November and January–April:
       <th scope="rowgroup" class="year" rowspan="2">2026</th>
       <th scope="row" class="session">July–November</th>
       <td><ul class="ta">
-        <li><strong class="role">PMRF TA</strong> for Course Name course at NPTEL. Course Instructor: Prof. Name, Department of Mathematics, Institute.</li>
-        <li><strong class="role">Institute TA</strong> for MA1234 (Course Name) under Dr. Name, Department of Mathematics, IIT Madras.</li>
+        <li><strong class="role">PMRF TA</strong> for the NPTEL course <em>Course Name</em>. Course instructor: Prof. Name, Department of Mathematics, Institute.</li>
+        <li><strong class="role">Institute TA</strong> for MA1234 <em>Course Name</em> under Dr. Name, Department of Mathematics, IIT Madras.</li>
       </ul></td>
     </tr>
     <tr>
       <th scope="row" class="session">January–April</th>
-      <td><strong class="role">Institute TA</strong> for MA5678 (Course Name) under Dr. Name, Department of Mathematics, IIT Madras.</td>
+      <td><strong class="role">Institute TA</strong> for MA5678 <em>Course Name</em> under Dr. Name, Department of Mathematics, IIT Madras.</td>
     </tr>
   </tbody>
 ```
@@ -141,7 +141,8 @@ sessions, July–November and January–April:
   one session, leave out `rowspan="2"` and the second `<tr>`.
 - One position in a session: write it straight into the `<td>`. Several positions: put
   each in an `<li>` of a `<ul class="ta">`, as above; the page divides them by a thin line.
-- `<strong class="role">` sets "PMRF TA" or "Institute TA" in bold. When a position's
+- `<strong class="role">` sets "PMRF TA" or "Institute TA" in bold, and `<em>` the course
+  name in italics. When a position's
   months differ from its session, add them after the role, e.g.
   `<strong class="role">PMRF TA</strong> (June–October) for …`.
 - The sentence common to all PMRF TA positions is in the last row of the table

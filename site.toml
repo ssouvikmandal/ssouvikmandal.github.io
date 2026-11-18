@@ -33,10 +33,9 @@ research_areas = ["Topology", "Geometry"]
 # Postal address, one line per entry, as shown on the Contact page.
 address = [
   "Souvik Mandal",
-  "Research Scholar, Department of Mathematics, IIT Madras",
-  "NAC-620, IIT Madras",
-  "Chennai 600036",
-  "India",
+  "Research Scholar, Department of Mathematics",
+  "NAC-620, Indian Institute of Technology Madras",
+  "Chennai 600036, India",
 ]
 # The photo is always images/photo.jpg and the CV is always cv.pdf: to update them,
 # replace those files (keep the names) and run python3 build.py.
@@ -68,7 +67,7 @@ label = "Teaching"
 file = "teaching.html"
 
 [[nav]]
-label = "Conference & Workshop"
+label = "Conferences & Workshops"
 file = "conferences.html"
 
 [[nav]]

@@ -83,7 +83,7 @@ body {
   .page, .site-footer > p { max-width: calc(var(--measure) + 4rem); padding: 0 2rem; }
 }
 @media (min-width: 60em) {
-  :root { --side: 14.5rem; --gap: 3.5rem; }
+  :root { --side: 15.5rem; --gap: 3.5rem; }
   .page, .site-footer > p {
     max-width: calc(var(--side) + var(--gap) + var(--measure) + 4rem);
   }
@@ -117,7 +117,7 @@ body {
   }
   body::before {                       /* left margin and menu column */
     left: 0;
-    width: calc(50% - 12rem);          /* the text column starts at 50% - 11rem */
+    width: calc(50% - 11.5rem);        /* the text column starts at 50% - 10.5rem */
     background-image: url("../images/bg-torus.svg"), url("../images/bg-knot.svg");
     background-size: 30rem auto, 15rem auto;
     background-position: right 0 top 10rem, left 2rem top 38rem;
@@ -125,7 +125,7 @@ body {
 }
 @media (min-width: 80em) {
   body::after {                        /* right margin */
-    left: calc(50% + 30rem);           /* the text column ends at 50% + 29rem */
+    left: calc(50% + 30.5rem);         /* the text column ends at 50% + 29.5rem */
     right: 0;
     background-image: url("../images/bg-hopf.svg");
     background-size: 26rem auto;
@@ -338,13 +338,13 @@ h3 {
 }
 
 p { margin: 0 0 1em; }
-main p, main li { hyphens: auto; -webkit-hyphens: auto; }
+main p, main li { hyphens: manual; }   /* ragged right: no automatic hyphenation */
 
 strong, b { font-weight: 700; }
 .nowrap { white-space: nowrap; }
 em, i, cite { font-style: italic; }
 
-/* Lists of entries (education, teaching, conferences, and later papers or talks) */
+/* Lists of entries (achievements, conferences, and later papers or talks) */
 ul.entries, ol.entries {
   margin: 0 0 1.5rem;
   padding-left: 1.3rem;
@@ -354,7 +354,18 @@ ul.entries, ol.entries {
   padding-left: .15rem;
 }
 .entries > li::marker { color: var(--accent); }
-ul.entries > li { list-style-type: "–\2002"; }
+/* Bullets: small round dots in the accent colour. */
+ul.entries > li { list-style: none; position: relative; }
+ul.entries > li::before {
+  content: "";
+  position: absolute;
+  left: -.95rem;
+  top: .68em;
+  width: .34em;
+  height: .34em;
+  border-radius: 50%;
+  background: var(--accent);
+}
 .entries .lead { font-variant-caps: small-caps; letter-spacing: .02em; }
 .entries .detail { display: block; margin-top: .2rem; }
 .entries .label { font-style: italic; }
@@ -415,6 +426,9 @@ ol.entries > li::marker { font-variant-numeric: tabular-nums; color: var(--muted
   margin-bottom: .7rem;
 }
 .dated .date { color: var(--muted); font-variant-numeric: tabular-nums; }
+.dated > li { margin-bottom: 1rem; }
+.dated .detail { display: block; margin-top: .2rem; color: var(--muted); }
+.cv-download { margin-top: 1.75rem; }
 @media (max-width: 39.99em) {
   .dated > li { grid-template-columns: 1fr; gap: 0; }
 }
