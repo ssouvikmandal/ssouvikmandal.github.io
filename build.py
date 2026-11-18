@@ -29,7 +29,9 @@ Email addresses never appear whole in the HTML, which keeps them away from the p
 that collect addresses for spam: the visible text contains a hidden decoy ("nospam." after
 the @, which visitors neither see nor copy), and the mailto: link is assembled from a
 scrambled copy by assets/email.js when the page loads. Without JavaScript the links lead
-to the Contact page, where the address can be read and copied.
+to the Contact page, where the address can be read and copied. On phones and tablets the
+links are mailto: links (they open the email app); on computers they open Gmail's "new
+message" window in a new browser tab.
 
 "Last updated" in the footer is the date on which a page's content last changed: the build
 keeps a fingerprint of every page in source/last-updated.json and only moves the date

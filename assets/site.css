@@ -385,6 +385,16 @@ dl.contact {
 }
 dl.contact dt { font-weight: 700; }
 dl.contact dd { margin: 0; overflow-wrap: anywhere; }
+/* Shown only on computers, where assets/email.js makes the email links open Gmail. */
+.mail-note { display: none; }
+.mail-web .mail-note {
+  display: block;
+  margin-top: 1.25rem;
+  color: var(--muted);
+  font-size: .9rem;
+  hyphens: manual;
+  -webkit-hyphens: manual;
+}
 @media (max-width: 39.99em) {
   /* Phones: each label above its value, so that addresses are not broken. */
   dl.contact { grid-template-columns: 1fr; row-gap: 0; }

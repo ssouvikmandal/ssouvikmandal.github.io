@@ -244,10 +244,26 @@ text of the form `name@domain`. On this site no address appears in that form any
   hidden decoy (`nospam.` after the `@`, in a `<span hidden>`). Browsers show and copy the
   real address, and screen readers read it, but a program that strips the HTML gets an
   address at a non-existent `nospam.` domain.
-- The `mailto:` link is not in the HTML at all: the link carries a scrambled copy of the
+- The link target is not in the HTML at all: the link carries a scrambled copy of the
   address (backwards, each character moved one place on) in `data-mail`, and
-  `assets/email.js` turns it into `mailto:…` when the page loads. Without JavaScript the
-  links lead to the Contact page, where the address can still be read and copied.
+  `assets/email.js` turns it into a working link when the page loads. Without JavaScript
+  the links lead to the Contact page, where the address can still be read and copied.
+
+Where the email links lead:
+
+- **Phones and tablets** (Android, iPhone, iPad): a `mailto:` link, which opens the email
+  app (for example the Gmail app) with a new message to the address.
+- **Computers**: Gmail's "new message" window in a new browser tab
+  (`https://mail.google.com/mail/?view=cm&fs=1&to=…`), with the address already filled
+  in; a visitor who is not signed in to Gmail signs in first and then gets the same
+  window. A `mailto:` link is not used on computers, because it only works when an email
+  program is set up there; when none is, Windows offers a list of browsers and nothing
+  happens. On computers the Contact page also shows a short note that the links open Gmail
+  and that the address can be copied for other email programs (`<p class="mail-note">` in
+  `source/pages/contact.html`; delete that line to remove the note).
+
+Which kind of device a visitor uses is read from the browser's description of itself
+(`navigator.userAgent`), in the first lines of `assets/email.js`.
 
 Never write an address in plain form in any file of this repository, including the README
 and commit messages: everything here is public.
