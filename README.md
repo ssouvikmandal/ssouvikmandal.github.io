@@ -259,9 +259,7 @@ Where the email links lead:
   in; a visitor who is not signed in to Gmail signs in first and then gets the same
   window. A `mailto:` link is not used on computers, because it only works when an email
   program is set up there; when none is, Windows offers a list of browsers and nothing
-  happens. On computers the Contact page also shows a short note that the links open Gmail
-  and that the address can be copied for other email programs (`<p class="mail-note">` in
-  `source/pages/contact.html`; delete that line to remove the note).
+  happens. Visitors who do not use Gmail can copy the address from the Contact page.
 
 Which kind of device a visitor uses is read from the browser's description of itself
 (`navigator.userAgent`), in the first lines of `assets/email.js`.

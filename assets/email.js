@@ -6,7 +6,7 @@
    - On computers it opens Gmail's "new message" window in a new browser tab, with the
      address already filled in. (A mailto: link on a computer only works when an email
      program is set up there, which is often not the case.) Visitors who do not use Gmail
-     can copy the address from the Contact page; a note there says so.
+     can copy the address from the Contact page.
 
    The attribute holds the address backwards, with every character moved one place on (so
    "@" becomes "A"); build.py writes it from site.toml. The address therefore never appears
@@ -32,5 +32,4 @@
       a.title = a.title ? a.title + ' (opens Gmail in a new tab)' : 'Opens Gmail in a new tab';
     }
   }
-  if (!phone) document.documentElement.className += ' mail-web';
 })();
