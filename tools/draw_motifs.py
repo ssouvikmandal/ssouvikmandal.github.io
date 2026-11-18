@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the topology motifs used in the header and as the favicon (SVG line drawings).
+"""Draw the topology motifs used for the favicon and the link preview (SVG line drawings).
 
 Three variants, each computed from its mathematical description:
 
@@ -14,8 +14,8 @@ For each variant the script writes, into source/motifs/:
   <name>.svg          header version (thin lines)
   <name>-icon.svg     favicon version (fewer, thicker lines, readable at 16-32 px)
 
-The chosen motif is installed as images/motif.svg and images/favicon.svg by
-tools/make_icons.py.
+The chosen motif (the Hopf fibration, whose icon is a Hopf link) is installed as the
+favicon and in the link-preview picture by tools/make_icons.py.
 
 It also draws the very faint background drawings shown in the page margins on computer
 screens (assets/site.css sets their position and faintness):

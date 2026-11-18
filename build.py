@@ -14,7 +14,8 @@ which are filled in from site.toml:
 
     {{name}} {{position}} {{department}} {{institution}} {{email}}
     {{institution_logo}}  the logo given by `institution_logo` (header of every page)
-    {{email_link}}     the email address as a mailto: link
+    {{email_link}}     the main email address as a protected mailto: link (see below)
+    {{email_rows}}     the Email rows of the Contact page: main address, then other_emails
     {{address}}        the postal address, one line per entry of `address`
     {{photo}}          the photo images/photo.jpg, with its size and alt text
     {{orcid_link}}     link to the ORCID profile
@@ -23,6 +24,12 @@ which are filled in from site.toml:
 
 Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
 MathJax from assets/mathjax/.
+
+Email addresses never appear whole in the HTML, which keeps them away from the programs
+that collect addresses for spam: the visible text contains a hidden decoy ("nospam." after
+the @, which visitors neither see nor copy), and the mailto: link is assembled from a
+scrambled copy by assets/email.js when the page loads. Without JavaScript the links lead
+to the Contact page, where the address can be read and copied.
 
 "Last updated" in the footer is the date on which a page's content last changed: the build
 keeps a fingerprint of every page in source/last-updated.json and only moves the date
@@ -131,12 +138,55 @@ def entities(text):
     return "".join(f"&#{ord(c)};" for c in text)
 
 
+def real_address(written):
+    """site.toml writes addresses as "name [at] domain"; turn that into name@domain."""
+    address = re.sub(r"\s*\[at\]\s*", "@", written.strip())
+    if address.count("@") != 1 or " " in address:
+        fail(f"site.toml: {written!r} is not an email address written as 'name [at] domain'")
+    return address
+
+
+def scramble(address):
+    """The address backwards, each character moved one code point on ("@" becomes "A");
+    assets/email.js undoes this."""
+    return "".join(chr(ord(c) + 1) for c in reversed(address))
+
+
+def email_text(address):
+    """The address as text that reads and copies correctly but holds a hidden decoy."""
+    local, _, domain = address.partition("@")
+    return f'{entities(local)}&#64;<span hidden>nospam.</span>{entities(domain)}'
+
+
+def email_link(address, label=""):
+    """A link that becomes mailto:address when assets/email.js runs."""
+    extra = f' aria-label="{html.escape(label)}" title="{html.escape(label)}"' if label else ""
+    return (f'<a class="email" href="contact.html#email" data-mail="{html.escape(scramble(address))}"'
+            f'{extra}>')
+
+
 def placeholders(cfg):
     p = cfg["person"]
     esc = html.escape
     values = {k: esc(str(p[k])) for k in ("name", "position", "department", "institution")}
-    values["email"] = entities(p["email"])
-    values["email_link"] = f'<a href="{entities("mailto:" + p["email"])}">{entities(p["email"])}</a>'
+    main_email = real_address(p["email"])
+    values["email"] = email_text(main_email)
+    values["email_link"] = email_link(main_email) + email_text(main_email) + "</a>"
+    rows = [f'  <dt id="email">Email:</dt>\n  <dd>{values["email_link"]}</dd>']
+    for label, written in p.get("other_emails", []):
+        address = real_address(written)
+        rows.append(f"  <dt>Email ({esc(label)}):</dt>\n  <dd>{email_link(address)}{email_text(address)}</a></dd>")
+    values["email_rows"] = "\n".join(rows)
+    # The two icons at the top of every page: ORCID record and email.
+    icons = []
+    if p.get("orcid"):
+        orcid_id = p["orcid"].rstrip("/").rsplit("/", 1)[-1]
+        icons.append(f'<a class="icon" href="{esc(p["orcid"])}" title="ORCID record: {esc(orcid_id)}" '
+                     f'aria-label="ORCID record of {esc(p["name"])}">'
+                     '<img src="images/orcid-id.svg" alt="" width="24" height="24"></a>')
+    icons.append(email_link(main_email, f'Email {p["name"]}').replace('class="email"', 'class="icon"')
+                 + '<img src="images/email.svg" alt="" width="24" height="24"></a>')
+    values["header_icons"] = '<div class="header-icons">' + "".join(icons) + "</div>"
     values["address"] = ('<address class="postal">\n'
                          + "<br>\n".join(esc(line) for line in p["address"])
                          + "\n</address>")
@@ -364,7 +414,7 @@ def check(cfg, files, external):
                 problems.append(f"{file}: link to {link}, but {path} does not exist")
             elif parts.fragment and path in pages and parts.fragment not in pages[path].ids:
                 problems.append(f"{file}: link to {link}, but {path} has no id {parts.fragment!r}")
-    for f in ("favicon.ico", "images/favicon.svg", "images/motif.svg", OG_IMAGE, PHOTO):
+    for f in ("favicon.ico", "images/favicon.svg", "assets/email.js", OG_IMAGE, PHOTO):
         if not (ROOT / f).exists():
             problems.append(f"missing file: {f}")
     if external:

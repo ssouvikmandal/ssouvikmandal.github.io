@@ -22,12 +22,13 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/newcm-web-book.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
+<script src="assets/email.js" defer></script>
 {{head_extra}}</head>
 <body>
 <a class="skip" href="#content">Skip to main content</a>
 <div class="page">
   <header class="site-header">
-    <img class="motif" src="images/motif.svg" alt="" width="64" height="64">
+    {{header_icons}}
     <div class="brand-text">
       <a class="name" href="index.html">{{name}}</a>
       <p class="affiliation">{{institution_logo}}<span class="aff-text"><span>{{position}},</span> <span>{{department}}, {{institution}}</span></span></p>

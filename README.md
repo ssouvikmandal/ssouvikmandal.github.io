@@ -5,8 +5,10 @@ Source and published files of <https://ssouvikmandal.github.io>, moved from the 
 the Google Site's text, with a few typing errors corrected; the Publications page was added
 from arXiv.
 
-The published site is plain HTML and CSS with relative links. Fonts and MathJax are stored
-here, and the site uses no outside services, trackers or cookies. A page is only regenerated
+The published site is plain HTML and CSS with relative links. Fonts, icons and MathJax are
+stored here, and the site uses no outside services, trackers or cookies. The only scripts
+are MathJax (on pages with formulas) and a few lines in `assets/email.js` that protect the
+email addresses; everything works without them. A page is only regenerated
 when you run `python3 build.py`, which needs Python 3.11 or later and nothing else.
 
 ## Contents
@@ -15,15 +17,16 @@ when you run `python3 build.py`, which needs Python 3.11 or later and nothing el
 - [Everyday changes](#everyday-changes): position, email, address · CV · photo · a
   teaching entry · a paper · a talk · a new section · formulas
 - [Publishing](#publishing)
+- [Email addresses and spam](#email-addresses-and-spam)
 - [Placeholders](#placeholders)
 - [Moving the site](#moving-the-site): your own domain · a university server
-- [The motif and the drawings in the margins](#the-motif-and-the-drawings-in-the-margins)
+- [The icons, the motif and the drawings in the margins](#the-icons-the-motif-and-the-drawings-in-the-margins)
 - [Tools and licences](#tools-and-licences)
 
 ## The files
 
 ```
-site.toml                 ← your name, position, affiliation, email, address, profiles, menu
+site.toml                 ← your name, position, affiliation, emails, address, profiles, menu
 source/pages/*.html       ← the text of each page (edit these)
 source/template.html      ← the frame around every page: head, header, menu, footer
 build.py                  ← turns the two above into the published pages
@@ -31,10 +34,13 @@ index.html, cv.html, …    ← the published pages (generated: do not edit by h
 cv.pdf                    ← your CV (at present a placeholder, see "Placeholders")
 images/photo.jpg          ← your photo
 images/logo-iit-madras.png ← the institution's logo beside the affiliation (set in site.toml)
-images/motif.svg, images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
-images/og-image.png       ← the motif in the header, the browser icons, the link preview
+images/orcid-id.svg, images/email.svg ← the ORCID and email icons at the top of every page
+images/favicon.svg, favicon.ico, images/apple-touch-icon.png,
+images/og-image.png       ← the browser icons (a Hopf link) and the link preview
+images/LICENSES.txt       ← where the ORCID icon, the email icon and the logo come from
 images/bg-*.svg           ← the faint drawings in the page margins (computers only)
 assets/site.css           ← the design: colours, fonts, spacing (colours at the top)
+assets/email.js           ← turns the protected email links into mailto: links
 assets/fonts/             ← the text font (New Computer Modern), see its README.txt
 assets/mathjax/, assets/mathjax-config.js   ← MathJax for formulas, see README-SITE.txt
 sitemap.xml, robots.txt   ← for search engines (generated)
@@ -69,7 +75,8 @@ position = "Postdoctoral Fellow"
 department = "Department of Mathematics"
 institution = "Example University"
 institution_logo = "images/logo-example-university.png"   # or "" for no logo
-email = "new.address@example.edu"
+email = "your.name [at] example.org"                      # main address, written with [at]
+other_emails = [["Example University", "s.mandal [at] example.edu"]]
 address = [
   "Souvik Mandal",
   "Department of Mathematics, Example University",
@@ -82,7 +89,12 @@ address = [
 page descriptions for search engines and in the structured data (schema.org) on the home
 page. `institution_logo` is the small logo shown beside that line: put the new logo (a
 square PNG, about 128 × 128 pixels) in `images/` and give its name here, or write `""` to
-show none. Keep the old logo file only if some page still uses it. `email` and `address` appear on the Contact page. Then rebuild. The introduction on
+show none. Keep the old logo file only if some page still uses it. `email` is the main
+address: the email icon at the top of every page opens it, and it comes first on the
+Contact page; `other_emails` are further addresses listed there with a label (write `[]`
+for none). Write every address with ` [at] ` instead of `@` (see
+[Email addresses and spam](#email-addresses-and-spam)). `address` is the postal address on
+the Contact page. Then rebuild. The introduction on
 the home page is ordinary text: edit it in `source/pages/index.html`.
 
 ### The CV
@@ -116,13 +128,13 @@ yourself you might later start a second list under a heading, e.g.
 
 Papers are listed in `source/pages/publications.html`, newest first. For a new preprint,
 copy the first `<li>…</li>` block, put the copy at the top of the list, and fill it in
-exactly as arXiv shows the paper:
+exactly as arXiv shows the paper (the year is that of the first version):
 
 ```html
   <li>
     <span class="authors">Souvik Mandal, A. Coauthor</span>.
     <span class="title">Title of the paper</span>.
-    <span class="nowrap"><a href="https://arxiv.org/abs/2701.01234">arXiv:2701.01234</a> <span class="meta">[math.AT]</span></span>
+    <span class="nowrap"><a href="https://arxiv.org/abs/2701.01234">arXiv:2701.01234</a> <span class="meta">[math.AT]</span>, 2027.</span>
   </li>
 ```
 
@@ -221,6 +233,25 @@ no real email address appears in the public history. `.git/hooks/pre-commit` run
 token. Git hooks are not copied by `git clone`; `~/work/server-config/README.md` says how to
 set them up again.
 
+## Email addresses and spam
+
+Programs that collect addresses for spam read web pages and public repositories looking for
+text of the form `name@domain`. On this site no address appears in that form anywhere:
+
+- In `site.toml` (which is public, in the repository and on the site) addresses are written
+  as `name [at] domain`; `build.py` turns them back into `name@domain`.
+- In the pages, the visible address is written with HTML character codes and contains a
+  hidden decoy (`nospam.` after the `@`, in a `<span hidden>`). Browsers show and copy the
+  real address, and screen readers read it, but a program that strips the HTML gets an
+  address at a non-existent `nospam.` domain.
+- The `mailto:` link is not in the HTML at all: the link carries a scrambled copy of the
+  address (backwards, each character moved one place on) in `data-mail`, and
+  `assets/email.js` turns it into `mailto:…` when the page loads. Without JavaScript the
+  links lead to the Contact page, where the address can still be read and copied.
+
+Never write an address in plain form in any file of this repository, including the README
+and commit messages: everything here is public.
+
 ## Placeholders
 
 | File | Placeholder for | Replace it by |
@@ -266,11 +297,19 @@ The old address `ssouvikmandal.github.io` then redirects to the new domain autom
 
 Keep this repository as the master copy, so that you can later move again.
 
-## The motif and the drawings in the margins
+## The icons, the motif and the drawings in the margins
 
-The line drawing in the header and the browser icon show the **Hopf fibration**: seven of
-its fibres (circles in $S^3$, stereographically projected to $\mathbb{R}^3$), linked
-with each other, as an over/under diagram. The icon shows two fibres, a Hopf link.
+At the top of every page, to the left of the name (beside it on phones), are two icons: the
+official ORCID iD icon, linking to the ORCID record (`orcid` in `site.toml`), and an email
+icon that opens a new email to the main address. Both have a tooltip and a label for screen
+readers. The ORCID icon must be used as ORCID provides it (green, unaltered); the email
+icon is the Feather Icons "mail" icon (MIT licence) on a circle in the accent colour. See
+`images/LICENSES.txt`.
+
+The browser icon and the link-preview picture show the **Hopf fibration**: the preview
+shows seven of its fibres (circles in $S^3$, stereographically projected to
+$\mathbb{R}^3$), linked with each other, as an over/under diagram; the browser icon shows
+two fibres, a Hopf link.
 Two other variants are ready in `source/motifs/`: a **torus** with meridians and parallels
 (hidden lines removed) and a **trefoil knot**. All of them are computed by
 `tools/draw_motifs.py` (Python with numpy); no image was copied from anywhere.
@@ -281,8 +320,7 @@ To switch to another variant, run (with Playwright installed)
 ~/venvs/web/bin/python tools/make_icons.py torus     # or knot, or hopf
 ```
 
-which installs the header drawing, the icons and the link-preview picture. Without
-Playwright, copy `source/motifs/torus.svg` to `images/motif.svg` and
+which installs the browser icons and the link-preview picture. Without Playwright, copy
 `source/motifs/torus-icon.svg` to `images/favicon.svg`; the PNG icons and the preview
 picture then keep the old motif.
 
@@ -296,9 +334,9 @@ phones and tablets do not show them. Their faintness is `--drawing-opacity: .16`
 of `assets/site.css`. At that value even the darkest point of a line leaves a contrast of
 12.7:1 for the menu text (at least 4.5:1 is required); keep it at .25 or below.
 
-The accent colour (links, menu, motif) is `--accent: #2e4a68` at the top of
-`assets/site.css`; if you change it, change `ACCENT` in `tools/draw_motifs.py` too and
-redraw the motif and the drawings.
+The accent colour (links, menu, drawings, email icon) is `--accent: #2e4a68` at the top of
+`assets/site.css`; if you change it, change `ACCENT` in `tools/draw_motifs.py` and the
+circle colour in `images/email.svg` too, and redraw the drawings.
 
 ## Tools and licences
 
@@ -310,9 +348,9 @@ fontTools):
 | Tool | Does | Needs |
 |---|---|---|
 | `tools/draw_motifs.py` | draws the motif variants into `source/motifs/` and the margin drawings into `images/bg-*.svg` | numpy |
-| `tools/make_icons.py NAME` | installs a motif: header image, icons, link preview | Playwright |
+| `tools/make_icons.py NAME` | installs a motif as the browser icons and in the link preview | Playwright |
 | `tools/make_fonts.py` | makes `assets/fonts/*.woff2` from TeX Live's New Computer Modern | fontTools, brotli, TeX Live |
-| `tools/screenshots.py DIR` | opens every page at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
+| `tools/screenshots.py DIR [--url URL]` | opens every page (of this folder, or of the published site with `--url`) at phone and computer width in headless Chromium, saves screenshots, reports outside requests, broken images, missing alt text and overflowing pages | Playwright |
 
 `python3 build.py --external` also tests the links to other websites.
 

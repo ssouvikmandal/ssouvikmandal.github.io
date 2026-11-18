@@ -1,0 +1,44 @@
+Images in this folder that come from elsewhere
+==============================================
+
+orcid-id.svg
+  The official ORCID iD icon, downloaded unchanged on 2026-11-18 from
+  https://orcid.org/assets/vectors/orcid.logo.icon.svg. ORCID's name and iD icon are
+  trademarks of ORCID, Inc.; the icon is used, as provided and unaltered, to link to the
+  ORCID record of the site's owner, as described in the ORCID brand guidelines
+  (https://info.orcid.org/brand-guidelines/) and the ORCID iD display guidelines
+  (https://info.orcid.org/documentation/integration-guide/orcid-id-display-guidelines/).
+
+email.svg
+  The "mail" icon of Feather Icons 4.29.2 (https://feathericons.com, npm package
+  "feather-icons" 4.29.2, checked against the registry's sha512 checksum), drawn in white
+  on a circle in the site's accent colour. Licence of Feather Icons:
+
+  The MIT License (MIT)
+  
+  Copyright (c) 2013-2023 Cole Bemis
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+logo-iit-madras.png
+  The logo of IIT Madras as used on the owner's former Google Site, reduced from 1200 to
+  128 pixels with shape and colours unchanged. It belongs to IIT Madras.
+
+Everything else here (photo, motif drawings, background drawings, icons made from the
+motif, preview picture) was made for this site or belongs to its owner.

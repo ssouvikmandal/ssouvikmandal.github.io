@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Install one of the motifs from source/motifs/ as the site's header image and icons.
+"""Install one of the motifs from source/motifs/ as the site's icons and preview picture.
 
     python tools/make_icons.py hopf      (or torus, or knot)
 
-Writes images/motif.svg (header), images/favicon.svg (browser tab), favicon.ico (older
+Writes images/favicon.svg (browser tab), favicon.ico (older
 browsers), images/apple-touch-icon.png (phone home screens) and images/og-image.png (the
 preview picture shown when a link to the site is shared). The PNG files are drawn by a
 headless Chromium through Playwright, which plain Python does not have (on the author's
 server: ~/venvs/web/bin/python tools/make_icons.py hopf).
 
-Without Playwright you can still switch the motif by hand: copy source/motifs/NAME.svg to
-images/motif.svg and source/motifs/NAME-icon.svg to images/favicon.svg. The PNG icons and
-the preview picture then keep the old motif until this script is run.
+Without Playwright you can still change the browser-tab icon by hand: copy
+source/motifs/NAME-icon.svg to images/favicon.svg. The PNG icons and the preview picture
+then keep the old motif until this script is run.
 """
 import argparse
 import shutil
@@ -47,7 +47,6 @@ def main():
     icon_svg = MOTIFS / f"{args.motif}-icon.svg"
     images = ROOT / "images"
     images.mkdir(exist_ok=True)
-    shutil.copyfile(header_svg, images / "motif.svg")
     shutil.copyfile(icon_svg, images / "favicon.svg")
     with open(ROOT / "site.toml", "rb") as f:
         name = tomllib.load(f)["person"]["name"]
@@ -92,7 +91,7 @@ def main():
         <div class="rule"></div><div class="what">Mathematics</div></div></body></html>"""
         (images / "og-image.png").write_bytes(shot(card, 1200, 630))
         browser.close()
-    for f in ("images/motif.svg", "images/favicon.svg", "favicon.ico",
+    for f in ("images/favicon.svg", "favicon.ico",
               "images/apple-touch-icon.png", "images/og-image.png"):
         print(f"{f}: {(ROOT / f).stat().st_size // 1024 + 1} KB")
 

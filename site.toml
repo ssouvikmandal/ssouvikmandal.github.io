@@ -18,7 +18,14 @@ institution = "IIT Madras"
 # Logo shown beside the affiliation line on every page; change it with the institution,
 # or set it to "" for no logo.
 institution_logo = "images/logo-iit-madras.png"
-email = "ma22d014@smail.iitm.ac.in"
+# Email addresses. Write " [at] " instead of "@": this file is public (in the repository
+# and on the site), and the spelled-out form keeps the addresses away from programs that
+# collect addresses for spam. build.py turns it back into "@".
+# Main address: shown first on the Contact page and opened by the email icon at the top
+# of every page.
+email = "ssouvik.xyz [at] gmail.com"
+# Further addresses shown on the Contact page, each as ["label", "address"].
+other_emails = [["IIT Madras", "ma22d014 [at] smail.iitm.ac.in"]]
 orcid = "https://orcid.org/0009-0004-0429-3063"
 google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
 # Research areas, for search engines (schema.org "knowsAbout"); not shown on the pages.
@@ -28,7 +35,7 @@ address = [
   "Souvik Mandal",
   "Research Scholar, Department of Mathematics, IIT Madras",
   "NAC-620, IIT Madras",
-  "Chennai -600036",
+  "Chennai 600036",
   "India",
 ]
 # The photo is always images/photo.jpg and the CV is always cv.pdf: to update them,
