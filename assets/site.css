@@ -437,6 +437,32 @@ ol.entries > li::marker { font-variant-numeric: tabular-nums; color: var(--muted
 .dated > li { margin-bottom: 1rem; }
 .dated .detail { display: block; margin-top: .2rem; color: var(--muted); }
 .cv-download { margin-top: 1.75rem; }
+
+/* Tutorial Videos: one box linking to the YouTube channel. */
+.video-card { margin-top: 1.75rem; }
+.video-card a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 34rem;
+  padding: .95rem 1.15rem;
+  border: 1px solid var(--rule);
+  border-radius: .5rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.video-card a:hover { border-color: var(--accent); }
+.video-card img { flex: none; width: 2.6rem; height: auto; }
+.vc-text { flex: 1; min-width: 0; }
+.vc-title { display: block; font-size: 1.15rem; color: var(--accent); }
+.video-card a:hover .vc-title { color: var(--accent-dark); }
+.vc-sub { display: block; margin-top: .1rem; font-size: .9rem; color: var(--muted); }
+.vc-sub span { white-space: nowrap; }   /* break the line only between the parts */
+@media (max-width: 39.99em) {             /* phones: one part per line, without the dots */
+  .vc-sub span { display: block; }
+  .vc-sub .sep { display: none; }
+}
+.vc-arrow { flex: none; font-size: 1.25rem; color: var(--accent); }
 @media (max-width: 39.99em) {
   .dated > li { grid-template-columns: 1fr; gap: 0; }
 }

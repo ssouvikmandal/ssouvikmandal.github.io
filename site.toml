@@ -38,6 +38,11 @@ other_emails = [["IIT Madras", "ma22d014 [at] smail.iitm.ac.in"]]
 orcid = "https://orcid.org/0009-0004-0429-3063"
 google_scholar = "https://scholar.google.com/citations?user=NDJZbpcAAAAJ"
 researchgate = "https://www.researchgate.net/profile/Souvik-Mandal-10"
+# Your YouTube channel with the recorded NPTEL tutorial sessions, linked from the
+# Tutorial Videos page (videos.html) and named to search engines as yours. Its permanent
+# address, which keeps working if the @-name changes, is
+# https://www.youtube.com/channel/UCeeAVgYaOxJqX92zh6iFJ-g
+youtube = "https://www.youtube.com/@mathematicsfrombasic4962"
 # For search engines only: these go into the description of you that Google and other
 # search engines read from the home page (schema.org; see README.md, "Search engines").
 # They are not shown on the pages, so keep them in line with what the pages say.
@@ -103,6 +108,10 @@ file = "achievements.html"
 [[nav]]
 label = "Teaching"
 file = "teaching.html"
+
+[[nav]]
+label = "Tutorial Videos"
+file = "videos.html"
 
 [[nav]]
 label = "Conferences & Workshops"

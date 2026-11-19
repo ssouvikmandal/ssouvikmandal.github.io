@@ -22,6 +22,8 @@ which are filled in from site.toml:
     {{scholar_link}}   link to the Google Scholar profile
     {{profile_links}}  a line with the link to the CV (ORCID, Google Scholar and email are
                        icons at the top of every page)
+    {{youtube}}        the address of the YouTube channel (`youtube`), for the Tutorial
+                       Videos page
 
 Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
 MathJax from assets/mathjax/.
@@ -218,6 +220,8 @@ def placeholders(cfg):
     icons.append(email_link(main_email, f'Email {p["name"]}').replace('class="email"', 'class="icon"')
                  + '<img src="images/email.svg" alt="" width="24" height="24"></a>')
     values["header_icons"] = '<div class="header-icons">' + "".join(icons) + "</div>"
+    if p.get("youtube"):
+        values["youtube"] = esc(p["youtube"])
     values["address"] = ('<address class="postal">\n'
                          + "<br>\n".join(esc(line) for line in p["address"])
                          + "\n</address>")
@@ -324,7 +328,8 @@ def count_clicks(page, cfg):
             return m.group(0)
         attrs = dict(re.findall(r'([\w-]+)="([^"]*)"', tag))
         href = html.unescape(attrs.get("href", ""))
-        text = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", inner)).split())
+        shown = re.sub(r'<(\w+)[^>]*aria-hidden="true"[^>]*>[^<]*</\1>', " ", inner)   # no "→"
+        text = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", shown)).split())
         title = html.unescape(attrs.get("aria-label") or attrs.get("title") or text)
         if "data-mail" in attrs:
             name, title = emails.get(html.unescape(attrs["data-mail"]), ("email", "Email"))
@@ -392,7 +397,8 @@ def home_jsonld(cfg, title, description, modified):
         person["award"] = p["awards"]
     if p.get("research_areas"):
         person["knowsAbout"] = p["research_areas"]
-    same_as = [u for u in (p.get("orcid"), p.get("google_scholar"), p.get("researchgate")) if u]
+    same_as = [u for u in (p.get("orcid"), p.get("google_scholar"), p.get("researchgate"),
+                           p.get("youtube")) if u]
     if same_as:
         person["sameAs"] = same_as
     if p.get("orcid"):
@@ -513,10 +519,13 @@ def build(now):
         if f not in files:
             print(f"note: source/pages/{f} is not in the menu (add it to [[nav]] in site.toml "
                   "to publish it)")
-    for file in files:
+    for file in files:      # check everything before writing anything
         src = PAGES / file
         if not src.exists():
             fail(f"site.toml lists {file} in the menu, but source/pages/{file} does not exist")
+        if "{{youtube}}" in src.read_text(encoding="utf-8") and "youtube" not in values:
+            fail(f"source/pages/{file} links to the YouTube channel, but `youtube` in site.toml "
+                 "is empty")
     new_dates, written = {}, []
     for file in files:
         meta, body = read_page(PAGES / file)

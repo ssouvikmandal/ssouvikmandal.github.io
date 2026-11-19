@@ -1,47 +1,52 @@
 {
   "404.html": {
-    "date": "2026-11-18",
-    "hash": "5a075ca9a08c1e3be31f8bbace4ddf86d1e195acbf584a6d5e05a626fe09567d",
-    "time": "2026-11-18T19:27:50+00:00"
+    "date": "2026-11-19",
+    "hash": "001bc87e88aa20fd719040714acc75201d787bb6d8f5a38702428b3d6641c193",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "achievements.html": {
-    "date": "2026-11-18",
-    "hash": "73cfb42324fd764a8439a8f045dbe7e7d59a8fd3d2a95107c37d74131b38f9e1",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "d2d5e61c6d8a992548b523f1a6856a7f2e4426a0b68a00bbfe67309d583918fc",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "conferences.html": {
-    "date": "2026-11-18",
-    "hash": "d80967a79a0ce70c996dfc394dea27da2c05c039f5d94415570e90a6095e4bb7",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "3e85da8a363ed7fdc70e4ad743644bc817b9068b072276047407608039eb588a",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "contact.html": {
-    "date": "2026-11-18",
-    "hash": "d625065234619842094656bb3d4460785876be191c919fa4f71e00f1f859c6a0",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "18f2c7e00226098b2130df4d2b8350f9342ece0ff3e35b39267326bc1bffab7e",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "cv.html": {
-    "date": "2026-11-18",
-    "hash": "3d178deb0de17311997e0a20fa77ca8e9f0d4f2d3db95233a722bb482a238e3d",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "76d49f077e6404dcc131b5d16925af5117bceab30388bf364c9450ed98e5aee1",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "index.html": {
-    "date": "2026-11-18",
-    "hash": "10290cc6a15a40d37ce81941a8c926d6b1b999770be8bb1a58bb0b20d8404ae3",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "7079c373a0137edb485de16a149d2bc5121f85391db7868b1964aebd3cd24c9d",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "publications.html": {
-    "date": "2026-11-18",
-    "hash": "c9d48b7ffa35ac7f9301d0f83291b110ce7fbaa8839f60ff0b700e3b605ac3d8",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "889d53d4c13e4c2bb37812e3f4ed40b72f1710221fffb7d42f46ea82e64dead6",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "research.html": {
-    "date": "2026-11-18",
-    "hash": "b9da45dc0e82fdc83d9b106605661a3b2144b8ed2a2ba6762b2e74304e3fc32a",
-    "time": "2026-11-18T19:09:32+00:00"
+    "date": "2026-11-19",
+    "hash": "f55def49d75a6054120d4d6de13aa2aaa69016d1a0a72dfdc7c7cdd9f6210655",
+    "time": "2026-11-19T05:27:43+00:00"
   },
   "teaching.html": {
-    "date": "2026-11-18",
-    "hash": "7760dfe3a1bc0586d49937ca3756b39fab3c5ae2ff3a4aff37bc15118275ce14",
-    "time": "2026-11-18T20:07:05+00:00"
+    "date": "2026-11-19",
+    "hash": "f6df916d62e21e77d7ec4bff9f49366a34162cded5150e4b6179f86fab41c7d0",
+    "time": "2026-11-19T05:27:43+00:00"
+  },
+  "videos.html": {
+    "date": "2026-11-19",
+    "hash": "1ca11140a2615acced9dfb9eec2d8de10ec56205ad5b65419fce0ff7c789cc27",
+    "time": "2026-11-19T05:27:43+00:00"
   }
 }

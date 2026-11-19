@@ -39,6 +39,7 @@ images/logo-iit-madras.png ← the institution's logo beside the affiliation (se
 images/orcid-id.svg, images/scholar.svg, images/researchgate.svg, images/email.svg
                           ← the ORCID, Google Scholar, ResearchGate and email icons at
                           the top of every page
+images/youtube.svg        ← the YouTube icon on the Tutorial Videos page
 favicon.ico, images/favicon-192.png, images/apple-touch-icon.png
                           ← the browser and phone icons (a shaded teal torus)
 images/og-image.png       ← the link-preview picture (Hopf fibration)
@@ -58,8 +59,8 @@ tools/                    ← optional helpers; they need extra Python packages,
 ```
 
 Page addresses never change: `index.html`, `cv.html`, `research.html`,
-`publications.html`, `achievements.html`, `teaching.html`, `conferences.html` and
-`contact.html`, and the CV is always `cv.pdf`. When you update a file, keep its name, so that old links keep working.
+`publications.html`, `achievements.html`, `teaching.html`, `videos.html` (Tutorial Videos),
+`conferences.html` and `contact.html`, and the CV is always `cv.pdf`. When you update a file, keep its name, so that old links keep working.
 
 ## Everyday changes
 
@@ -236,6 +237,15 @@ student. Do not create a page before it has content.
 The placeholders that `build.py` fills in are listed at the top of `build.py`, for example
 `{{name}}`, `{{email_link}}`, `{{address}}`, `{{photo}}` and `{{profile_links}}`.
 
+### The Tutorial Videos page
+
+`videos.html` (source: `source/pages/videos.html`) describes the recorded weekly NPTEL
+tutorial sessions and links, in one box with the YouTube icon, to the channel's home page:
+`youtube` in `site.toml` (the page uses it as `{{youtube}}`; `build.py` stops with a message
+if the address is missing). To change the channel, change that line and rebuild. Videos are
+linked, not embedded: an embedded YouTube player would bring Google's cookies and trackers
+into the site.
+
 ### Formulas
 
 Write TeX between `$…$` or `\(…\)` (inline) or `$$…$$` or `\[…\]` (displayed); write `\$`
@@ -296,7 +306,7 @@ headers, so nothing here needs editing by hand:
   name in results) and a `ProfilePage` about you (`Person`): name, photo, position,
   institution and department with their web addresses, places studied (`studied_at`),
   awards (`awards`), research areas (`research_areas`), ORCID iD, and the ORCID, Google
-  Scholar and ResearchGate profiles as the same person (`sameAs`). All of it comes from `site.toml`; keep it
+  Scholar and ResearchGate profiles and the YouTube channel as the same person (`sameAs`). All of it comes from `site.toml`; keep it
   in line with the pages. The ORCID, Google Scholar and ResearchGate icons also carry `rel="me"`. The
   profile also says when the site was first published (`created` in `site.toml`) and when
   the home page last changed (kept in `source/last-updated.json`), both as date, time and
