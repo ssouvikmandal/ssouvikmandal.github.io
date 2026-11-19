@@ -18,5 +18,8 @@ as the GUST Font License requests for modified fonts.
   newcm-web-bolditalic.woff2   NewCM10-BoldItalic.otf bold italic text
   newcm-web-math.woff2         NewCMMath-Book.otf     symbols such as ℝ, ℤ, ≤ in the text
 
+assets/site.css also draws one glyph of NewCMMath-Book.otf, the maps-to arrow (U+21A6),
+as an SVG mask: the mark beside the current page in the menu (same licence).
+
 Formulas are typeset by MathJax (assets/mathjax/), which brings its own New Computer
 Modern math font.

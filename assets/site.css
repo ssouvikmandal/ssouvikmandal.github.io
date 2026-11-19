@@ -306,6 +306,29 @@ a.name:hover { color: var(--accent); }
     border-top: 1px solid currentColor;
   }
 }
+/* The mark beside the current page on computers: the maps-to arrow ↦ (LaTeX \mapsto), the
+   glyph U+21A6 of New Computer Modern Math Book (GUST Font License, like the text fonts),
+   drawn as a mask in the link colour. It stands on the text's baseline at the glyph's own
+   size, like a character typed before the word (raised .036 em so that its stroke meets
+   the middle of the small capitals), and the negative margin puts it in the margin
+   without moving the text. Browsers without masks, and Windows
+   high-contrast mode, keep the short dash above. */
+@supports (mask-image: none) or (-webkit-mask-image: none) {
+  @media (min-width: 60em) and (forced-colors: none) {
+    .site-nav a[aria-current="page"]::before {
+      position: static;
+      display: inline-block;
+      width: .865em;                 /* the glyph: 865 × 521 units of 1000 per em */
+      height: .521em;
+      margin: 0 .5em 0 -1.365em;
+      vertical-align: .025em;        /* on the baseline, raised a hair to centre it on the small capitals */
+      border: 0;
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='56 -510 865 521'%3E%3Cpath transform='scale(1 -1)' d='M910 234C917 237 921 243 921 250C921 257 917 263 910 266C862 282 817 316 775 368C747 403 728 444 719 491C716 504 708 510 695 510C679 510 671 502 671 485L672 483V482C689 395 733 326 806 274H104V486C104 502 96 510 80 510C64 510 56 502 56 486V14C56 -3 64 -11 80 -11C96 -11 104 -3 104 14V226H806C733 174 689 105 672 18V17L671 15C671 -2 679 -10 695 -10C708 -10 716 -4 719 9C728 56 747 97 775 132C817 184 862 218 910 234Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='56 -510 865 521'%3E%3Cpath transform='scale(1 -1)' d='M910 234C917 237 921 243 921 250C921 257 917 263 910 266C862 282 817 316 775 368C747 403 728 444 719 491C716 504 708 510 695 510C679 510 671 502 671 485L672 483V482C689 395 733 326 806 274H104V486C104 502 96 510 80 510C64 510 56 502 56 486V14C56 -3 64 -11 80 -11C96 -11 104 -3 104 14V226H806C733 174 689 105 672 18V17L671 15C671 -2 679 -10 695 -10C708 -10 716 -4 719 9C728 56 747 97 775 132C817 184 862 218 910 234Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+    }
+  }
+}
 
 /* Main text */
 main {
