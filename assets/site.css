@@ -227,8 +227,8 @@ a.name:hover { color: var(--accent); }
 .aff-text span { display: inline-block; }
 .inst-logo {               /* logo of the institution, from site.toml */
   flex: none;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.1rem;
+  height: 2.1rem;
 }
 @media (max-width: 39.99em) {
   /* Phones: the name with the icons beside it (below it if there is no room), then the
