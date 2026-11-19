@@ -465,9 +465,10 @@ Keep this repository as the master copy, so that you can later move again.
 ## The icons, the motif and the drawings in the margins
 
 On computers the menu marks the page you are on with the maps-to arrow ↦ (LaTeX
-`\mapsto`), drawn from New Computer Modern Math in the link colour (`assets/site.css`, "The
-mark beside the current page"); browsers that cannot draw it, and Windows high-contrast
-mode, show a short dash instead. On phones the current page is underlined.
+`\mapsto`), the glyph of New Computer Modern Math written as text in the link colour
+(`assets/site.css`, "The mark beside the current page"; the glyph is in
+`assets/fonts/newcm-web-math.woff2`). Being text, it changes colour together with the menu
+text in the dark modes of browsers. On phones the current page is underlined.
 
 At the top of every page, to the left of the name (beside it on phones), are four icons,
 one below the other: the official ORCID iD icon, linking to the ORCID record (`orcid` in
