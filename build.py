@@ -24,6 +24,7 @@ which are filled in from site.toml:
                        icons at the top of every page)
     {{youtube}}        the address of the YouTube channel (`youtube`), for the Tutorial
                        Videos page
+    {{playlists}}      the YouTube playlists ([[playlists]] in site.toml), grouped by course
 
 Pages that contain a formula ($...$, \\(...\\), $$...$$ or \\[...\\]) automatically load
 MathJax from assets/mathjax/.
@@ -222,6 +223,8 @@ def placeholders(cfg):
     values["header_icons"] = '<div class="header-icons">' + "".join(icons) + "</div>"
     if p.get("youtube"):
         values["youtube"] = esc(p["youtube"])
+    if cfg.get("playlists"):
+        values["playlists"] = playlists_html(cfg["playlists"])
     values["address"] = ('<address class="postal">\n'
                          + "<br>\n".join(esc(line) for line in p["address"])
                          + "\n</address>")
@@ -253,6 +256,30 @@ def placeholders(cfg):
                                + '<span class="dot" aria-hidden="true">·</span>'.join(links)
                                + "</p>")
     return values
+
+
+def playlists_html(playlists):
+    """The playlists as a list of courses, each with its terms as links (newest first).
+    Each link's title names the course and the term (a tooltip, and the name the visitor
+    counter records for a click)."""
+    lines = ['<ul class="entries playlists">']
+    for entry in playlists:
+        course = entry.get("course", "")
+        terms = entry.get("terms", [])
+        if not course or not terms:
+            fail("site.toml: each [[playlists]] needs a `course` and at least one term")
+        lines.append(f"  <li><em>{html.escape(course)}</em>")
+        lines.append('    <ul class="terms">')
+        for item in terms:
+            if len(item) != 2 or not str(item[1]).startswith("https://www.youtube.com/playlist?list="):
+                fail(f"site.toml: playlist term {item!r} of {course!r} should be "
+                     '["months year", "https://www.youtube.com/playlist?list=…"]')
+            label, url = item
+            lines.append(f'      <li><a href="{html.escape(url)}" '
+                         f'title="{attr(f"{course}, {label} (YouTube playlist)")}">{html.escape(label)}</a></li>')
+        lines.append("    </ul></li>")
+    lines.append("</ul>")
+    return "\n".join(lines)
 
 
 def attr(text):
@@ -526,6 +553,8 @@ def build(now):
         if "{{youtube}}" in src.read_text(encoding="utf-8") and "youtube" not in values:
             fail(f"source/pages/{file} links to the YouTube channel, but `youtube` in site.toml "
                  "is empty")
+        if "{{playlists}}" in src.read_text(encoding="utf-8") and "playlists" not in values:
+            fail(f"source/pages/{file} lists the playlists, but site.toml has no [[playlists]]")
     new_dates, written = {}, []
     for file in files:
         meta, body = read_page(PAGES / file)

@@ -246,6 +246,18 @@ if the address is missing). To change the channel, change that line and rebuild.
 linked, not embedded: an embedded YouTube player would bring Google's cookies and trackers
 into the site.
 
+Below the box, "Playlists" lists one YouTube playlist per course and term, grouped by course
+(`{{playlists}}`, made by `build.py` from `[[playlists]]` in `site.toml`). For a new term,
+add one line at the top of the course's `terms`, e.g.
+
+```toml
+  ["January–April 2027", "https://www.youtube.com/playlist?list=…"],
+```
+
+(a new course gets its own `[[playlists]]` block), then run `python3 build.py --check`.
+Write the months as on the Teaching page. Each link's tooltip names the course and the
+term, and the visitor counter records clicks under that name.
+
 ### Formulas
 
 Write TeX between `$…$` or `\(…\)` (inline) or `$$…$$` or `\[…\]` (displayed); write `\$`

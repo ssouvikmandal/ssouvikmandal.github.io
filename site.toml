@@ -83,6 +83,39 @@ bing_site_verification = ""
 # switches counting off. See README.md, "Visitor statistics".
 goatcounter = "ssouvikmandal"
 
+# Playlists of the recorded NPTEL tutorial sessions, shown on the Tutorial Videos page
+# grouped by course, in this order. List each course's terms newest first, each as
+# ["months year", "playlist address"]. For a new term, add one line at the top of its
+# course's list (or a new [[playlists]] block for a new course) and run python3 build.py.
+[[playlists]]
+course = "An Introduction to Point-Set-Topology Part-II"
+terms = [
+  ["July–October 2026", "https://www.youtube.com/playlist?list=PLfoAB0iNFs4U"],
+  ["July–October 2025", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK4Q5Q6VCOgfcGt7pNu80vUz"],
+  ["June–October 2024", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK6_PsBzG-3fB7Cg6pcl8TIC"],
+  ["July–October 2023", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK45NuzcHM424dxMpt-mAS1j"],
+]
+
+[[playlists]]
+course = "An Introduction to Point-Set-Topology Part-I"
+terms = [
+  ["January–April 2026", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK6rVuplDR-IgNG56X-KyqGl"],
+  ["January–April 2025", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK4a0M8HC67I0xhRazwWyQxM"],
+  ["January–April 2024", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK6_SqAnUZxkJvM2IGq53n6p"],
+]
+
+[[playlists]]
+course = "Algebra-I"
+terms = [
+  ["July–October 2023", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK6jyTVmrwhrgZJ5EEZyQYi4"],
+]
+
+[[playlists]]
+course = "Basic Real Analysis"
+terms = [
+  ["February–April 2023", "https://www.youtube.com/playlist?list=PLJ97HYuiNtK5wCFH5_eEqIy5ZYXYc4iee"],
+]
+
 # The menu at the top of every page, in this order. Each entry is a page in
 # source/pages/ that is published under the same file name.
 [[nav]]
